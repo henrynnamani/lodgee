@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lodge — Student Housing in Nsukka</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --surface2: #222222;
+    --border: #2a2a2a;
+    --orange: #ff6b2b;
+    --orange-dim: rgba(255,107,43,0.12);
+    --green: #25D366;
+    --green-dim: rgba(37,211,102,0.12);
+    --text: #f0ede8;
+    --muted: #888;
+    --muted2: #555;
+    --badge-fire: #ff6b2b;
+    --badge-warn: #f59e0b;
+    --badge-fast: #8b5cf6;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  h1,h2,h3,h4,h5 { font-family: 'Syne', sans-serif; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(15,15,15,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.4rem;
+    color: var(--orange);
+    letter-spacing: -0.5px;
+  }
+  .nav-logo span { color: var(--text); }
+  .nav-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-ghost {
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); padding: 7px 16px; border-radius: 8px;
+    font-size: 0.82rem; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
+  .btn-primary {
+    background: var(--orange); color: #fff; border: none;
+    padding: 8px 18px; border-radius: 8px;
+    font-size: 0.82rem; font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #e55a1f; transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 60px 24px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255,107,43,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: var(--orange-dim); color: var(--orange);
+    border: 1px solid rgba(255,107,43,0.25);
+    padding: 5px 14px; border-radius: 20px;
+    font-size: 0.78rem; font-weight: 600;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 6vw, 3.4rem);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 14px;
+  }
+  .hero h1 em { color: var(--orange); font-style: normal; }
+  .hero p {
+    color: var(--muted); font-size: 1rem; max-width: 460px;
+    margin: 0 auto 30px; line-height: 1.6;
+  }
+
+  /* ── SEARCH BAR ── */
+  .search-bar {
+    display: flex; gap: 0;
+    max-width: 520px; margin: 0 auto 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .search-bar:focus-within { border-color: var(--orange); }
+  .search-bar input {
+    flex: 1; background: none; border: none; outline: none;
+    padding: 14px 18px; color: var(--text);
+    font-size: 0.92rem; font-family: 'DM Sans', sans-serif;
+  }
+  .search-bar input::placeholder { color: var(--muted2); }
+  .search-bar button {
+    background: var(--orange); border: none; color: #fff;
+    padding: 0 22px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    transition: background 0.2s;
+  }
+  .search-bar button:hover { background: #e55a1f; }
+  .hero-stats {
+    display: flex; gap: 24px; justify-content: center;
+    margin-top: 20px; flex-wrap: wrap;
+  }
+  .hero-stat { color: var(--muted); font-size: 0.82rem; }
+  .hero-stat strong { color: var(--text); font-weight: 600; }
+
+  /* ── MAIN LAYOUT ── */
+  .main { display: flex; gap: 0; max-width: 1280px; margin: 0 auto; padding: 0 24px 60px; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 260px; flex-shrink: 0;
+    padding: 24px 0;
+    position: sticky; top: 76px;
+    height: calc(100vh - 76px);
+    overflow-y: auto;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .filter-section { margin-bottom: 28px; }
+  .filter-label {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 12px; display: block;
+  }
+  .filter-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    padding: 6px 13px; border-radius: 20px; font-size: 0.8rem;
+    border: 1px solid var(--border); color: var(--muted);
+    cursor: pointer; transition: all 0.18s; background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .chip:hover { border-color: var(--orange); color: var(--orange); }
+  .chip.active { background: var(--orange-dim); border-color: var(--orange); color: var(--orange); font-weight: 600; }
+  .price-range { padding: 4px 0; }
+  .range-input {
+    width: 100%;
+    accent-color: var(--orange);
+    cursor: pointer;
+  }
+  .range-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.78rem; color: var(--muted); }
+  .range-value { color: var(--orange); font-weight: 600; font-size: 0.82rem; margin-top: 6px; }
+  .filter-divider { height: 1px; background: var(--border); margin: 4px 0 20px; }
+
+  /* ── CONTENT ── */
+  .content { flex: 1; padding: 24px 0 0 28px; }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  }
+  .toolbar-left { display: flex; align-items: center; gap: 12px; }
+  .results-count { font-size: 0.85rem; color: var(--muted); }
+  .results-count strong { color: var(--text); }
+  .sort-group { display: flex; gap: 6px; align-items: center; }
+  .sort-label { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+  .sort-btn {
+    padding: 6px 14px; border-radius: 8px; font-size: 0.8rem;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--muted); cursor: pointer; transition: all 0.18s;
+    font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap-5px;
+  }
+  .sort-btn:hover, .sort-btn.active { border-color: var(--orange); color: var(--orange); background: var(--orange-dim); }
+  .sort-btn .arrow { margin-left: 4px; font-size: 0.7rem; }
+
+  /* ── GRID ── */
+  .listings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+    position: relative;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,107,43,0.35);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .card-media {
+    position: relative;
+    height: 190px; overflow: hidden;
+    background: var(--surface2);
+  }
+  .card-media img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.4s;
+  }
+  .card:hover .card-media img { transform: scale(1.05); }
+  .card-media-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+  }
+  .tap-hint {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.7); color: #fff;
+    font-size: 0.72rem; font-weight: 600;
+    padding: 4px 12px; border-radius: 20px;
+    opacity: 0; transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .card:hover .tap-hint { opacity: 1; }
+  .video-badge {
+    position: absolute; top: 10px; left: 10px;
+    background: rgba(0,0,0,0.75); color: #fff;
+    font-size: 0.7rem; padding: 3px 9px; border-radius: 20px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .card-badges {
+    position: absolute; top: 10px; right: 10px;
+    display: flex; flex-direction: column; gap: 5px; align-items: flex-end;
+  }
+  .badge {
+    font-size: 0.68rem; font-weight: 700;
+    padding: 3px 9px; border-radius: 20px;
+    display: flex; align-items: center; gap: 3px;
+    white-space: nowrap;
+  }
+  .badge-verified { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+  .badge-fire { background: rgba(255,107,43,0.2); color: var(--orange); border: 1px solid rgba(255,107,43,0.3); }
+  .badge-warn { background: rgba(245,158,11,0.2); color: var(--badge-warn); border: 1px solid rgba(245,158,11,0.3); }
+  .badge-fast { background: rgba(139,92,246,0.2); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+
+  .card-body { padding: 14px 16px 16px; }
+  .card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; line-height: 1.3; }
+  .card-meta { display: flex; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .card-meta-item { font-size: 0.76rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+  .card-meta-item.ok { color: #4ade80; }
+  .card-meta-item.no { color: #f87171; }
+  .card-price-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+  .card-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem; font-weight: 800;
+    color: var(--orange);
+  }
+  .card-price-hint { font-size: 0.72rem; color: var(--muted); }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .card-agent { font-size: 0.75rem; color: var(--muted); }
+  .card-agent strong { color: var(--text); font-weight: 500; }
+  .card-date { font-size: 0.7rem; color: var(--muted2); }
+  .card-social-proof { font-size: 0.72rem; color: var(--muted); margin-bottom: 8px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .card-social-proof span { display: flex; align-items: center; gap: 3px; }
+
+  /* ── MODAL ── */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 20px 16px;
+    overflow-y: auto;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s;
+  }
+  .modal-backdrop.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    width: 100%; max-width: 700px;
+    overflow: hidden;
+    transform: translateY(24px);
+    transition: transform 0.3s;
+    margin: auto;
+  }
+  .modal-backdrop.open .modal { transform: translateY(0); }
+  .modal-media {
+    position: relative; height: 280px; background: var(--surface2);
+    overflow: hidden;
+  }
+  .modal-media img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-media-badges {
+    position: absolute; top: 14px; right: 14px;
+    display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
+  }
+  .modal-close {
+    position: absolute; top: 14px; left: 14px;
+    background: rgba(0,0,0,0.6); border: none; color: #fff;
+    width: 36px; height: 36px; border-radius: 50%;
+    font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,107,43,0.8); }
+  .modal-body { padding: 24px; }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+  .modal-location { color: var(--muted); font-size: 0.88rem; margin-bottom: 18px; display: flex; align-items: center; gap: 6px; }
+  .modal-price-hero {
+    background: var(--orange-dim); border: 1px solid rgba(255,107,43,0.2);
+    border-radius: 12px; padding: 16px 18px; margin-bottom: 20px;
+  }
+  .modal-price-big { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--orange); }
+  .modal-price-label { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .breakdown-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin: 14px 0 10px; }
+  .breakdown-rows { display: flex; flex-direction: column; gap: 0; }
+  .breakdown-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 0; border-bottom: 1px solid var(--border);
+    font-size: 0.86rem;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .label { color: var(--muted); }
+  .breakdown-row .value { font-weight: 600; color: var(--text); }
+  .breakdown-row.total .label { color: var(--text); font-weight: 700; }
+  .breakdown-row.total .value { color: var(--orange); font-weight: 800; font-size: 1rem; }
+  .breakdown-note {
+    background: var(--surface2); border-radius: 8px;
+    padding: 10px 14px; margin-top: 10px;
+    font-size: 0.76rem; color: var(--muted); line-height: 1.5;
+  }
+  .modal-details-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin: 20px 0;
+  }
+  .detail-item {
+    background: var(--surface2); border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .detail-item .dlabel { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 5px; }
+  .detail-item .dvalue { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+  .detail-item .dvalue.ok { color: #4ade80; }
+  .detail-item .dvalue.no { color: #f87171; }
+  .detail-item .dvalue.ns { color: var(--muted); font-style: italic; font-weight: 400; }
+  .inspection-box {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; margin: 16px 0;
+    font-size: 0.82rem; line-height: 1.6; color: var(--muted);
+  }
+  .inspection-box strong { color: var(--text); display: block; margin-bottom: 6px; font-size: 0.86rem; }
+  .inspection-tip {
+    margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
+    font-size: 0.78rem; color: var(--muted);
+  }
+  .agent-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface2);
+    border-radius: 12px; margin-bottom: 14px;
+  }
+  .agent-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--orange-dim); border: 2px solid var(--orange);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; color: var(--orange); font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .agent-info .agent-name { font-weight: 600; font-size: 0.9rem; }
+  .agent-info .agent-meta { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
+  .agent-info .agent-rating { color: var(--orange); font-size: 0.78rem; margin-top: 1px; }
+  .btn-whatsapp {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 16px;
+    background: var(--green); color: #fff;
+    border: none; border-radius: 12px;
+    font-size: 1rem; font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+    margin-bottom: 10px;
+  }
+  .btn-whatsapp:hover { background: #1db954; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,0.3); }
+  .btn-secondary-cta {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 13px;
+    background: none; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 12px;
+    font-size: 0.88rem; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-secondary-cta:hover { border-color: var(--orange); color: var(--orange); }
+  .social-proof-bar {
+    display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .spb-item { font-size: 0.76rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+  .spb-item span { color: var(--text); font-weight: 500; }
+
+  /* ── MOBILE SIDEBAR ── */
+  .mobile-filter-btn {
+    display: none;
+    align-items: center; gap: 8px;
+    padding: 8px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+    color: var(--muted); font-size: 0.82rem; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .mobile-filter-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .mobile-overlay {
+    display: none; position: fixed; inset: 0; z-index: 150;
+    background: rgba(0,0,0,0.7);
+  }
+  .mobile-sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 300px; z-index: 160;
+    background: var(--surface); border-right: 1px solid var(--border);
+    padding: 24px; overflow-y: auto;
+    transform: translateX(-100%); transition: transform 0.3s;
+  }
+  .mobile-sidebar.open { transform: translateX(0); }
+  .mobile-sidebar-close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none; color: var(--muted);
+    font-size: 1.2rem; cursor: pointer;
+  }
+
+  /* ── EMPTY ── */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-state p { font-size: 1rem; margin-top: 10px; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 24px; text-align: center;
+    color: var(--muted); font-size: 0.8rem;
+  }
+  footer strong { color: var(--orange); }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .content { padding-left: 0; }
+    .mobile-filter-btn { display: flex; }
+    .mobile-overlay { display: block; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .mobile-overlay.open { opacity: 1; pointer-events: all; }
+  }
+  @media (max-width: 600px) {
+    .hero { padding: 40px 16px 30px; }
+    .main { padding: 0 16px 40px; }
+    .modal-details-grid { grid-template-columns: 1fr; }
+    .listings-grid { grid-template-columns: 1fr; }
+    .toolbar { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Lodge<span>.</span></div>
+  <div class="nav-actions">
+    <button class="btn-ghost" onclick="alert('Agent signup coming soon!')">List a Room</button>
+    <button class="btn-primary" onclick="alert('Student signup coming soon!')">Find Housing</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">🏠 Nsukka & Enugu Student Housing</div>
+  <h1>Find your room.<br/><em>No middlemen. No surprises.</em></h1>
+  <p>Real prices. Verified listings. Direct agent contact. Stop wandering — start moving in.</p>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search by area, e.g. Maryland, Odim, Hilltop…" oninput="filterListings()"/>
+    <button onclick="filterListings()">Search</button>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>47</strong> verified rooms</div>
+    <div class="hero-stat"><strong>12</strong> agents active</div>
+    <div class="hero-stat"><strong>₦80k–₦600k</strong> price range</div>
+    <div class="hero-stat"><strong>3</strong> rooms added today</div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR (desktop) -->
+  <aside class="sidebar">
+    <div class="filter-section">
+      <span class="filter-label">Room Type</span>
+      <div class="filter-chips" id="typeChips">
+        <div class="chip active" data-type="All" onclick="selectChip(this,'type')">All</div>
+        <div class="chip" data-type="Single" onclick="selectChip(this,'type')">Single</div>
+        <div class="chip" data-type="Self-Contain" onclick="selectChip(this,'type')">Self-Contain</div>
+        <div class="chip" data-type="Shared" onclick="selectChip(this,'type')">Shared</div>
+        <div class="chip" data-type="Flat" onclick="selectChip(this,'type')">Flat</div>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-section">
+      <span class="filter-label">Max Price</span>
+      <div class="price-range">
+        <input type="range" class="range-input" min="80000" max="600000" step="10000" value="600000" id="priceRange" oninput="updatePrice(this)"/>
+        <div class="range-labels"><span>₦80k</span><span>₦600k</span></div>
+        <div class="range-value" id="priceRangeVal">Up to ₦600,000</div>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-section">
+      <span class="filter-label">Distance to School</span>
+      <div class="filter-chips" id="distChips">
+        <div class="chip active" data-dist="All" onclick="selectChip(this,'dist')">Any</div>
+        <div class="chip" data-dist="5" onclick="selectChip(this,'dist')">≤5 min</div>
+        <div class="chip" data-dist="10" onclick="selectChip(this,'dist')">≤10 min</div>
+        <div class="chip" data-dist="20" onclick="selectChip(this,'dist')">≤20 min</div>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-section">
+      <span class="filter-label">Amenities</span>
+      <div class="filter-chips">
+        <div class="chip" id="filterWater" onclick="toggleAmenity('water',this)">💧 Water</div>
+        <div class="chip" id="filterElec" onclick="toggleAmenity('elec',this)">⚡ Electricity</div>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-section">
+      <span class="filter-label">Availability</span>
+      <div class="filter-chips" id="availChips">
+        <div class="chip active" data-avail="All" onclick="selectChip(this,'avail')">All</div>
+        <div class="chip" data-avail="Immediate" onclick="selectChip(this,'avail')">Immediate</div>
+        <div class="chip" data-avail="Next Month" onclick="selectChip(this,'avail')">Next Month</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button class="mobile-filter-btn" onclick="openMobileSidebar()">⚙ Filters</button>
+        <div class="results-count" id="resultsCount"><strong>8</strong> rooms found</div>
+      </div>
+      <div class="sort-group">
+        <span class="sort-label">Sort:</span>
+        <button class="sort-btn active" id="sort-price" onclick="setSort('price',this)">Cheapest <span class="arrow" id="arrow-price">↑</span></button>
+        <button class="sort-btn" id="sort-dist" onclick="setSort('dist',this)">Closest</button>
+        <button class="sort-btn" id="sort-new" onclick="setSort('new',this)">Newest</button>
+      </div>
+    </div>
+
+    <div class="listings-grid" id="listingsGrid"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div style="font-size:2.5rem;">🔍</div>
+      <p>No rooms match your filters. Try adjusting the price or type.</p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="handleBackdropClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-media">
+      <img id="modalImg" src="" alt="Room"/>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-media-badges" id="modalBadges"></div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- MOBILE SIDEBAR -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+<div class="mobile-sidebar" id="mobileSidebar">
+  <button class="mobile-sidebar-close" onclick="closeMobileSidebar()">✕</button>
+  <div style="margin-top:10px;">
+    <div class="filter-section">
+      <span class="filter-label">Room Type</span>
+      <div class="filter-chips" id="typeChipsMobile">
+        <div class="chip active" data-type="All" onclick="selectChip(this,'type')">All</div>
+        <div class="chip" data-type="Single" onclick="selectChip(this,'type')">Single</div>
+        <div class="chip" data-type="Self-Contain" onclick="selectChip(this,'type')">Self-Contain</div>
+        <div class="chip" data-type="Shared" onclick="selectChip(this,'type')">Shared</div>
+        <div class="chip" data-type="Flat" onclick="selectChip(this,'type')">Flat</div>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-section">
+      <span class="filter-label">Max Price</span>
+      <div class="price-range">
+        <input type="range" class="range-input" min="80000" max="600000" step="10000" value="600000" oninput="updatePrice(this)"/>
+        <div class="range-labels"><span>₦80k</span><span>₦600k</span></div>
+        <div class="range-value">Up to ₦600,000</div>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-section">
+      <span class="filter-label">Distance to School</span>
+      <div class="filter-chips" id="distChipsMobile">
+        <div class="chip active" data-dist="All" onclick="selectChip(this,'dist')">Any</div>
+        <div class="chip" data-dist="5" onclick="selectChip(this,'dist')">≤5 min</div>
+        <div class="chip" data-dist="10" onclick="selectChip(this,'dist')">≤10 min</div>
+        <div class="chip" data-dist="20" onclick="selectChip(this,'dist')">≤20 min</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;">
+      <button class="btn-primary" style="width:100%;padding:12px;" onclick="closeMobileSidebar()">Apply Filters</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <strong>Lodge</strong> — Connecting students to verified housing in Nsukka & Enugu.<br/>
+  <span style="margin-top:6px;display:block;">All listings are sourced from agent WhatsApp groups. Confirm all details directly with the agent.</span>
+</footer>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const listings = [
+  {
+    id: 1,
+    title: "Single Room — Maryland Back Gate",
+    type: "Single",
+    area: "Maryland",
+    price: 300000,
+    distMin: 5,
+    distLabel: "5 min walk",
+    distMode: "🚶 5 min walk",
+    water: true, elec: true,
+    availability: "Immediate",
+    daysAgo: 1,
+    views: 14,
+    roomsLeft: 2,
+    badge: "fire",
+    badgeLabel: "Best Value 🔥",
+    verified: true,
+    agent: { name: "Emeka Obi", listings: 8, rating: "4.8 ⭐", phone: "2348012345678" },
+    img: "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=600&q=80",
+    breakdown: { rent: 180000, agency: 60000, legal: 30000, caution: 30000 },
+    breakdownConfirmed: true,
+    notes: "Prepaid meter. Borehole water. Tiled floor. Near Odim junction.",
+    size: "Medium",
+    furnished: "Partially",
+    security: "Caretaker on site",
+  },
+  {
+    id: 2,
+    title: "Self-Contain — Hilltop Estate",
+    type: "Self-Contain",
+    area: "Hilltop",
+    price: 480000,
+    distMin: 8,
+    distLabel: "8 min walk",
+    distMode: "🚶 8 min walk",
+    water: true, elec: true,
+    availability: "Immediate",
+    daysAgo: 2,
+    views: 9,
+    roomsLeft: 1,
+    badge: "fast",
+    badgeLabel: "Fast Filling ⏳",
+    verified: true,
+    agent: { name: "Chioma Eze", listings: 12, rating: "4.6 ⭐", phone: "2348098765432" },
+    img: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80",
+    breakdown: { rent: 280000, agency: 80000, legal: 60000, caution: 60000 },
+    breakdownConfirmed: true,
+    notes: "Private kitchen and bathroom. 24/7 borehole. Close to Faculty of Engineering.",
+    size: "Large",
+    furnished: "Furnished",
+    security: "Gated compound",
+  },
+  {
+    id: 3,
+    title: "Shared Room — Odim Street",
+    type: "Shared",
+    area: "Odim",
+    price: 120000,
+    distMin: 3,
+    distLabel: "3 min walk",
+    distMode: "🚶 3 min walk",
+    water: false, elec: true,
+    availability: "Immediate",
+    daysAgo: 0,
+    views: 22,
+    roomsLeft: 3,
+    badge: null,
+    badgeLabel: null,
+    verified: true,
+    agent: { name: "Uche Nwosu", listings: 5, rating: "4.3 ⭐", phone: "2348055678901" },
+    img: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
+    breakdown: { rent: 70000, agency: 20000, legal: 15000, caution: 15000 },
+    breakdownConfirmed: false,
+    notes: "Shared with 1 other student. PHCN available. Water from well (not specified by agent).",
+    size: "Small",
+    furnished: "Not furnished",
+    security: "Not specified",
+  },
+  {
+    id: 4,
+    title: "Single Room — Ngene Area",
+    type: "Single",
+    area: "Ngene",
+    price: 200000,
+    distMin: 12,
+    distLabel: "12 min walk",
+    distMode: "🚲 ₦200 bike to school",
+    water: true, elec: false,
+    availability: "Next Month",
+    daysAgo: 3,
+    views: 6,
+    roomsLeft: 4,
+    badge: "warn",
+    badgeLabel: "Overpriced ⚠️",
+    verified: false,
+    agent: { name: "Adaeze Okonkwo", listings: 3, rating: "4.1 ⭐", phone: "2348033456789" },
+    img: "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=600&q=80",
+    breakdown: null,
+    breakdownConfirmed: false,
+    notes: "Borehole water. PHCN not available — generator schedule weekdays 6–10pm.",
+    size: "Medium",
+    furnished: "Not furnished",
+    security: "Fence and gate",
+  },
+  {
+    id: 5,
+    title: "2-Bedroom Flat — Ede-Oballa Road",
+    type: "Flat",
+    area: "Ede-Oballa",
+    price: 580000,
+    distMin: 18,
+    distLabel: "18 min walk",
+    distMode: "🛺 ₦300 keke to school",
+    water: true, elec: true,
+    availability: "Immediate",
+    daysAgo: 5,
+    views: 11,
+    roomsLeft: 1,
+    badge: "fast",
+    badgeLabel: "Fast Filling ⏳",
+    verified: true,
+    agent: { name: "Emeka Obi", listings: 8, rating: "4.8 ⭐", phone: "2348012345678" },
+    img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80",
+    breakdown: { rent: 350000, agency: 100000, legal: 65000, caution: 65000 },
+    breakdownConfirmed: true,
+    notes: "Ideal for couples or 2 students splitting costs. Modern kitchen. DSTV point.",
+    size: "Large",
+    furnished: "Semi-furnished",
+    security: "24/7 security",
+  },
+  {
+    id: 6,
+    title: "Self-Contain — Obiagu Close",
+    type: "Self-Contain",
+    area: "Obiagu",
+    price: 350000,
+    distMin: 7,
+    distLabel: "7 min walk",
+    distMode: "🚶 7 min walk",
+    water: true, elec: true,
+    availability: "Immediate",
+    daysAgo: 1,
+    views: 17,
+    roomsLeft: 2,
+    badge: "fire",
+    badgeLabel: "Best Value 🔥",
+    verified: true,
+    agent: { name: "Ngozi Ibe", listings: 6, rating: "4.5 ⭐", phone: "2348077654321" },
+    img: "https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=600&q=80",
+    breakdown: { rent: 200000, agency: 70000, legal: 40000, caution: 40000 },
+    breakdownConfirmed: true,
+    notes: "Own toilet and bathroom. Tiled throughout. Quiet compound. Near UNN back gate.",
+    size: "Medium",
+    furnished: "Partially",
+    security: "Gated",
+  },
+  {
+    id: 7,
+    title: "Single Room — Agbani Road",
+    type: "Single",
+    area: "Agbani",
+    price: 160000,
+    distMin: 20,
+    distLabel: "20 min walk",
+    distMode: "🛺 ₦250 keke to school",
+    water: null, elec: true,
+    availability: "Immediate",
+    daysAgo: 7,
+    views: 4,
+    roomsLeft: 5,
+    badge: null,
+    badgeLabel: null,
+    verified: false,
+    agent: { name: "Onyeka Madu", listings: 2, rating: "4.0 ⭐", phone: "2348011223344" },
+    img: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80",
+    breakdown: null,
+    breakdownConfirmed: false,
+    notes: "PHCN available. Water not specified by agent.",
+    size: "Small",
+    furnished: "Not furnished",
+    security: "Not specified",
+  },
+  {
+    id: 8,
+    title: "Shared Room — Eke-Obinna Street",
+    type: "Shared",
+    area: "Eke-Obinna",
+    price: 90000,
+    distMin: 4,
+    distLabel: "4 min walk",
+    distMode: "🚶 4 min walk",
+    water: true, elec: true,
+    availability: "Next Month",
+    daysAgo: 2,
+    views: 19,
+    roomsLeft: 1,
+    badge: "fast",
+    badgeLabel: "Fast Filling ⏳",
+    verified: true,
+    agent: { name: "Chioma Eze", listings: 12, rating: "4.6 ⭐", phone: "2348098765432" },
+    img: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80",
+    breakdown: { rent: 55000, agency: 15000, legal: 10000, caution: 10000 },
+    breakdownConfirmed: true,
+    notes: "Shared with 1 female student. Very clean compound. Close to Faculty of Arts.",
+    size: "Small",
+    furnished: "Not furnished",
+    security: "Caretaker",
+  },
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let state = {
+  type: 'All', maxPrice: 600000, dist: 'All',
+  avail: 'All', water: false, elec: false,
+  sort: 'price', sortDir: 1,
+  search: ''
+};
+
+// ── FILTER & SORT ─────────────────────────────────────────────────────────────
+function getFiltered() {
+  return listings.filter(l => {
+    if (state.type !== 'All' && l.type !== state.type) return false;
+    if (l.price > state.maxPrice) return false;
+    if (state.dist !== 'All' && l.distMin > parseInt(state.dist)) return false;
+    if (state.avail !== 'All' && l.availability !== state.avail) return false;
+    if (state.water && !l.water) return false;
+    if (state.elec && !l.elec) return false;
+    if (state.search) {
+      const q = state.search.toLowerCase();
+      if (!l.title.toLowerCase().includes(q) && !l.area.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b) => {
+    if (state.sort === 'price') return (a.price - b.price) * state.sortDir;
+    if (state.sort === 'dist') return (a.distMin - b.distMin) * state.sortDir;
+    if (state.sort === 'new') return (a.daysAgo - b.daysAgo) * state.sortDir;
+    return 0;
+  });
+}
+
+function renderListings() {
+  const data = getFiltered();
+  const grid = document.getElementById('listingsGrid');
+  const empty = document.getElementById('emptyState');
+  const count = document.getElementById('resultsCount');
+  count.innerHTML = `<strong>${data.length}</strong> room${data.length !== 1 ? 's' : ''} found`;
+  if (data.length === 0) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = data.map(l => cardHTML(l)).join('');
+}
+
+function fmt(n) { return '₦' + n.toLocaleString('en-NG'); }
+function daysLabel(d) { return d === 0 ? 'Today' : d === 1 ? 'Yesterday' : `${d} days ago`; }
+
+function badgeHTML(l) {
+  let b = '';
+  if (l.verified) b += `<span class="badge badge-verified">✓ Verified</span>`;
+  if (l.badge === 'fire') b += `<span class="badge badge-fire">${l.badgeLabel}</span>`;
+  if (l.badge === 'warn') b += `<span class="badge badge-warn">${l.badgeLabel}</span>`;
+  if (l.badge === 'fast') b += `<span class="badge badge-fast">${l.badgeLabel}</span>`;
+  return b;
+}
+
+function cardHTML(l) {
+  return `
+  <div class="card" onclick="openModal(${l.id})">
+    <div class="card-media">
+      <img src="${l.img}" alt="${l.title}" loading="lazy"/>
+      <div class="card-media-overlay"></div>
+      <div class="video-badge">▶ Video</div>
+      <div class="card-badges">${badgeHTML(l)}</div>
+      <div class="tap-hint">👉 Tap to view details</div>
+    </div>
+    <div class="card-body">
+      <div class="card-social-proof">
+        <span>👁 ${l.views} viewed today</span>
+        <span>🏠 ${l.roomsLeft} room${l.roomsLeft > 1?'s':''} left</span>
+        <span>🕐 ${daysLabel(l.daysAgo)}</span>
+      </div>
+      <div class="card-title">${l.title}</div>
+      <div class="card-meta">
+        <div class="card-meta-item">📍 ${l.area}</div>
+        <div class="card-meta-item">🏷 ${l.type}</div>
+        <div class="card-meta-item">🚶 ${l.distLabel}</div>
+        <div class="card-meta-item ${l.water === true ? 'ok' : l.water === false ? 'no' : ''}">${l.water === true ? '💧 Water ✓' : l.water === false ? '💧 No water' : '💧 Not specified'}</div>
+        <div class="card-meta-item ${l.elec === true ? 'ok' : l.elec === false ? 'no' : ''}">${l.elec === true ? '⚡ Electricity ✓' : '⚡ No electricity'}</div>
+      </div>
+      <div class="card-price-row">
+        <div>
+          <div class="card-price">${fmt(l.price)}</div>
+          <div class="card-price-hint">${l.breakdownConfirmed ? 'Full breakdown inside' : 'Includes all fees (estimated)'}</div>
+        </div>
+        <div style="font-size:0.76rem;color:var(--muted);text-align:right;">
+          ${l.availability === 'Immediate' ? '<span style="color:#4ade80;font-weight:600;">Available now</span>' : `<span style="color:var(--badge-warn);">From next month</span>`}
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-agent">Agent: <strong>${l.agent.name}</strong></div>
+        <div class="card-date">${l.agent.listings} listings</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(id) {
+  const l = listings.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('modalImg').src = l.img;
+  document.getElementById('modalBadges').innerHTML = badgeHTML(l);
+
+  const waMsg = encodeURIComponent(`Hello, I saw the ${l.type} at ${l.area} (${fmt(l.price)}) on Lodge. Is it still available?`);
+  const waLink = `https://wa.me/${l.agent.phone}?text=${waMsg}`;
+
+  let breakdownHTML = '';
+  if (l.breakdown && l.breakdownConfirmed) {
+    const total = Object.values(l.breakdown).reduce((a,b)=>a+b,0);
+    breakdownHTML = `
+      <div class="breakdown-title">Price Breakdown</div>
+      <div class="breakdown-rows">
+        <div class="breakdown-row"><span class="label">Rent</span><span class="value">${fmt(l.breakdown.rent)}</span></div>
+        <div class="breakdown-row"><span class="label">Agency Fee</span><span class="value">${fmt(l.breakdown.agency)}</span></div>
+        <div class="breakdown-row"><span class="label">Legal Fee</span><span class="value">${fmt(l.breakdown.legal)}</span></div>
+        <div class="breakdown-row"><span class="label">Caution Deposit</span><span class="value">${fmt(l.breakdown.caution)}</span></div>
+        <div class="breakdown-row total"><span class="label">Total First Payment</span><span class="value">${fmt(total)}</span></div>
+      </div>`;
+  } else {
+    breakdownHTML = `
+      <div class="breakdown-title">Price Breakdown</div>
+      <div class="breakdown-rows">
+        <div class="breakdown-row"><span class="label">Total (Full Payment)</span><span class="value">${fmt(l.price)}</span></div>
+      </div>
+      <div class="breakdown-note">⚠️ Detailed breakdown not provided by agent. Estimated based on typical pricing in this area. <strong>Confirm all costs with agent before proceeding.</strong></div>`;
+  }
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="social-proof-bar">
+      <div class="spb-item">👁 <span>${l.views} people viewed today</span></div>
+      <div class="spb-item">🏠 <span>${l.roomsLeft} room${l.roomsLeft > 1?'s':''} left</span></div>
+      <div class="spb-item">🕐 <span>Updated ${daysLabel(l.daysAgo)}</span></div>
+    </div>
+    <div class="modal-title">${l.title}</div>
+    <div class="modal-location">📍 ${l.area}, Nsukka &nbsp;·&nbsp; ${l.distMode}</div>
+
+    <div class="modal-price-hero">
+      <div class="modal-price-big">${fmt(l.price)}</div>
+      <div class="modal-price-label">Move-in total · ${l.breakdownConfirmed ? 'Confirmed by agent' : 'Estimated breakdown'}</div>
+      ${breakdownHTML}
+    </div>
+
+    <div class="modal-details-grid">
+      <div class="detail-item"><div class="dlabel">Room Type</div><div class="dvalue">${l.type}</div></div>
+      <div class="detail-item"><div class="dlabel">Availability</div><div class="dvalue ${l.availability==='Immediate'?'ok':''}">${l.availability}</div></div>
+      <div class="detail-item"><div class="dlabel">Water Supply</div><div class="dvalue ${l.water===true?'ok':l.water===false?'no':'ns'}">${l.water===true?'✓ Available':l.water===false?'✗ Not available':'Not specified'}</div></div>
+      <div class="detail-item"><div class="dlabel">Electricity</div><div class="dvalue ${l.elec===true?'ok':l.elec===false?'no':'ns'}">${l.elec===true?'✓ Available':l.elec===false?'✗ Not available':'Not specified'}</div></div>
+      <div class="detail-item"><div class="dlabel">Room Size</div><div class="dvalue">${l.size}</div></div>
+      <div class="detail-item"><div class="dlabel">Furnished</div><div class="dvalue">${l.furnished}</div></div>
+      <div class="detail-item"><div class="dlabel">Security</div><div class="dvalue ${l.security==='Not specified'?'ns':''}">${l.security}</div></div>
+      <div class="detail-item"><div class="dlabel">Distance</div><div class="dvalue">${l.distMode}</div></div>
+    </div>
+
+    ${l.notes ? `<div class="inspection-box"><strong>📝 Agent Notes</strong>${l.notes}</div>` : ''}
+
+    <div class="inspection-box">
+      <strong>🔍 Inspection Fee</strong>
+      ₦1,000–₦3,000 (set by agent). Paid directly to the agent before a physical viewing. It covers the agent's time and service for organizing and guiding inspections. Transport costs, if any, are separate. Inspection fees are typically non-refundable.
+      <div class="inspection-tip">💡 Tip: Confirm total costs with the agent before proceeding.</div>
+    </div>
+
+    <div class="agent-row">
+      <div class="agent-avatar">${l.agent.name[0]}</div>
+      <div class="agent-info">
+        <div class="agent-name">${l.agent.name}</div>
+        <div class="agent-meta">${l.agent.listings} listings on Lodge</div>
+        <div class="agent-rating">${l.agent.rating}</div>
+      </div>
+    </div>
+
+    <a class="btn-whatsapp" href="${waLink}" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      Chat Agent on WhatsApp
+    </a>
+    <button class="btn-secondary-cta" onclick="alert('Sign in to request a formal viewing through Lodge.')">
+      🔒 Sign in to Book Inspection
+    </button>
+  `;
+
+  document.getElementById('modalBackdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleBackdropClick(e) {
+  if (e.target === document.getElementById('modalBackdrop')) closeModal();
+}
+
+// ── CONTROLS ──────────────────────────────────────────────────────────────────
+function selectChip(el, group) {
+  const map = { type: ['typeChips','typeChipsMobile'], dist: ['distChips','distChipsMobile'], avail: ['availChips'] };
+  (map[group] || []).forEach(id => {
+    const container = document.getElementById(id);
+    if (container) container.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  });
+  document.querySelectorAll(`[data-${group}="${el.dataset[group] || el.dataset.type || el.dataset.dist || el.dataset.avail}"]`).forEach(c => c.classList.add('active'));
+  state[group] = el.dataset[group] || el.dataset.type || el.dataset.dist || el.dataset.avail;
+  renderListings();
+}
+
+function updatePrice(input) {
+  state.maxPrice = parseInt(input.value);
+  document.querySelectorAll('.range-value').forEach(el => {
+    el.textContent = `Up to ₦${parseInt(input.value).toLocaleString('en-NG')}`;
+  });
+  document.querySelectorAll('.range-input').forEach(el => el.value = input.value);
+  renderListings();
+}
+
+function toggleAmenity(key, el) {
+  state[key] = !state[key];
+  el.classList.toggle('active', state[key]);
+  renderListings();
+}
+
+function filterListings() {
+  state.search = document.getElementById('searchInput').value;
+  renderListings();
+}
+
+let sortDirs = { price: 1, dist: 1, new: 1 };
+function setSort(key, el) {
+  if (state.sort === key) {
+    sortDirs[key] *= -1;
+    state.sortDir = sortDirs[key];
+    const arrow = document.getElementById(`arrow-${key}`);
+    if (arrow) arrow.textContent = sortDirs[key] === 1 ? '↑' : '↓';
+  } else {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    state.sort = key;
+    state.sortDir = 1;
+    sortDirs[key] = 1;
+  }
+  renderListings();
+}
+
+function openMobileSidebar() {
+  document.getElementById('mobileSidebar').classList.add('open');
+  document.getElementById('mobileOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileSidebar() {
+  document.getElementById('mobileSidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderListings();
+</script>
+</body>
+</html>
