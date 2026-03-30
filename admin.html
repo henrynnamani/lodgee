@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="https://unpkg.com/convex@1.3.1/dist/browser.bundle.js"></script>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Lodge Admin — Live Convex + Cloudinary</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap"
+            rel="stylesheet" />
+        <script
+            src="https://unpkg.com/convex@1.9.0/dist/browser/convex.browser.js"></script>
+        <style>
+/* ... (keep all existing styles from your HTML) ... */
+:root {
+  --bg: #0c0c0c;
+  --surface: #161616;
+  --surface2: #1e1e1e;
+  --surface3: #232323;
+  --border: #262626;
+  --border2: #303030;
+  --orange: #ff6b2b;
+  --orange-dim: rgba(255,107,43,0.10);
+  --orange-glow: rgba(255,107,43,0.20);
+  --green: #25D366;
+  --green-dim: rgba(37,211,102,0.10);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.10);
+  --yellow: #f59e0b;
+  --yellow-dim: rgba(245,158,11,0.10);
+  --purple: #8b5cf6;
+  --text: #ede9e4;
+  --muted: #7a7a7a;
+  --muted2: #4a4a4a;
+  --radius: 12px;
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh}
+
+/* Login Gate */
+#loginGate{
+  position:fixed;inset:0;z-index:999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+}
+.login-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:40px 36px;width:100%;max-width:360px;
+  text-align:center;
+}
+.login-logo{font-family:var(--font-head);font-weight:800;font-size:1.6rem;color:var(--orange);margin-bottom:4px}
+.login-logo span{color:var(--text)}
+.login-sub{font-size:0.78rem;color:var(--muted);margin-bottom:28px}
+.login-label{display:block;font-size:0.68rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted2);margin-bottom:7px;text-align:left}
+.login-input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:11px 14px;color:var(--text);
+  font-size:0.88rem;font-family:var(--font-body);outline:none;
+  transition:border-color 0.2s;margin-bottom:14px;
+}
+.login-input:focus{border-color:var(--orange)}
+.login-btn{
+  width:100%;background:var(--orange);color:#fff;border:none;
+  border-radius:8px;padding:12px;font-size:0.9rem;font-weight:700;
+  font-family:var(--font-head);cursor:pointer;transition:all 0.2s;
+}
+.login-btn:hover{background:#e55a1f}
+.login-error{color:var(--red);font-size:0.76rem;margin-top:8px;display:none}
+
+/* Nav */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(12,12,12,0.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;display:flex;align-items:center;justify-content:space-between;
+  height:58px;
+}
+.nav-logo{font-family:var(--font-head);font-weight:800;font-size:1.3rem;color:var(--orange);letter-spacing:-0.5px}
+.nav-logo span{color:var(--text)}
+.nav-badge{
+  background:rgba(255,107,43,0.15);color:var(--orange);border:1px solid rgba(255,107,43,0.25);
+  font-size:0.64rem;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;
+  padding:3px 8px;border-radius:5px;margin-left:10px;
+}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-link{
+  color:var(--muted);font-size:0.8rem;text-decoration:none;
+  border:1px solid var(--border);padding:6px 13px;border-radius:7px;
+  transition:all 0.2s;cursor:pointer;background:none;font-family:var(--font-body);
+}
+.nav-link:hover{border-color:var(--orange);color:var(--orange)}
+.logout-btn{
+  color:var(--muted);font-size:0.8rem;background:none;border:none;
+  cursor:pointer;font-family:var(--font-body);transition:color 0.2s;
+}
+.logout-btn:hover{color:var(--red)}
+.convex-dot{width:7px;height:7px;border-radius:50%;background:var(--muted2)}
+.convex-dot.live{background:#4ade80;box-shadow:0 0 6px rgba(74,222,128,0.5);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.convex-status{display:flex;align-items:center;gap:5px;font-size:0.7rem;color:var(--muted2)}
+
+/* App Layout */
+.app{display:flex;min-height:calc(100vh - 58px)}
+
+/* Sidebar */
+.sidebar{
+  width:220px;flex-shrink:0;
+  border-right:1px solid var(--border);
+  padding:20px 0;position:sticky;top:58px;
+  height:calc(100vh - 58px);overflow-y:auto;
+}
+.sidebar-section{margin-bottom:6px}
+.sidebar-label{
+  font-size:0.6rem;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--muted2);padding:0 18px;margin-bottom:6px;display:block;
+}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 18px;font-size:0.83rem;color:var(--muted);
+  cursor:pointer;transition:all 0.18s;border:none;background:none;
+  width:100%;text-align:left;font-family:var(--font-body);
+  border-left:2px solid transparent;
+}
+.sidebar-item:hover{color:var(--text);background:var(--surface2)}
+.sidebar-item.active{color:var(--orange);background:var(--orange-dim);border-left-color:var(--orange);font-weight:500}
+.sidebar-item .icon{font-size:1rem;width:18px;text-align:center}
+.sidebar-count{
+  margin-left:auto;background:var(--surface3);color:var(--muted);
+  font-size:0.65rem;padding:1px 7px;border-radius:10px;
+}
+.sidebar-divider{height:1px;background:var(--border);margin:10px 18px}
+
+/* Main Content */
+.main{flex:1;padding:28px;overflow-y:auto}
+.page{display:none}
+.page.active{display:block}
+
+/* Stats Bar */
+.stats-bar{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:14px;margin-bottom:26px;
+}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 18px;
+}
+.stat-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted2);margin-bottom:6px}
+.stat-value{font-family:var(--font-head);font-size:1.7rem;font-weight:800;color:var(--text)}
+.stat-sub{font-size:0.72rem;color:var(--muted);margin-top:3px}
+.stat-card.orange .stat-value{color:var(--orange)}
+.stat-card.green .stat-value{color:#4ade80}
+
+/* Page Header */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.page-title{font-family:var(--font-head);font-size:1.3rem;font-weight:800}
+.page-sub{font-size:0.8rem;color:var(--muted);margin-top:2px}
+.btn-add{
+  display:flex;align-items:center;gap:7px;
+  background:var(--orange);color:#fff;border:none;
+  padding:9px 18px;border-radius:8px;
+  font-size:0.84rem;font-weight:700;font-family:var(--font-head);
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-add:hover{background:#e55a1f;transform:translateY(-1px)}
+
+/* Table Styles */
+.table-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+}
+.table-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  gap:10px;flex-wrap:wrap;
+}
+.table-search{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:7px;padding:7px 12px;flex:1;max-width:280px;
+}
+.table-search input{
+  background:none;border:none;outline:none;color:var(--text);
+  font-size:0.82rem;font-family:var(--font-body);width:100%;
+}
+.table-search input::placeholder{color:var(--muted2)}
+table{width:100%;border-collapse:collapse}
+thead th{
+  text-align:left;font-size:0.65rem;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--muted2);
+  padding:10px 16px;border-bottom:1px solid var(--border);
+  background:var(--surface2);white-space:nowrap;
+}
+tbody tr{transition:background 0.15s;cursor:pointer}
+tbody tr:hover{background:var(--surface2)}
+tbody tr:not(:last-child) td{border-bottom:1px solid var(--border)}
+td{padding:11px 16px;font-size:0.82rem;color:var(--text);vertical-align:middle}
+.td-title{font-weight:500;font-family:var(--font-head);font-size:0.84rem}
+.td-muted{color:var(--muted);font-size:0.76rem}
+.td-price{font-family:var(--font-head);font-weight:700;color:var(--orange)}
+.td-badge{
+  display:inline-flex;align-items:center;
+  font-size:0.68rem;font-weight:600;padding:2px 8px;border-radius:10px;
+}
+.td-badge.active{background:var(--green-dim);color:#4ade80;border:1px solid rgba(37,211,102,0.2)}
+.td-badge.draft{background:var(--yellow-dim);color:var(--yellow);border:1px solid rgba(245,158,11,0.2)}
+.td-actions{display:flex;gap:6px;white-space:nowrap}
+.btn-sm{
+  padding:5px 10px;border-radius:6px;font-size:0.72rem;font-weight:600;
+  cursor:pointer;transition:all 0.18s;font-family:var(--font-body);
+  display:flex;align-items:center;gap:4px;
+}
+.btn-edit{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,107,43,0.2)}
+.btn-edit:hover{background:var(--orange-glow)}
+.btn-delete{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+.btn-delete:hover{background:rgba(239,68,68,0.2)}
+.thumb{width:42px;height:32px;border-radius:5px;object-fit:cover;display:block}
+.thumb-placeholder{width:42px;height:32px;border-radius:5px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--muted2)}
+
+/* Form Styles */
+.form-wrap{max-width:760px}
+.form-section{margin-bottom:28px}
+.form-section-title{
+  font-family:var(--font-head);font-size:0.95rem;font-weight:700;
+  margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:0.67rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted2);font-weight:600}
+.form-label .req{color:var(--orange)}
+.form-input,.form-select,.form-textarea{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:10px 13px;color:var(--text);
+  font-size:0.86rem;font-family:var(--font-body);outline:none;
+  transition:border-color 0.2s;width:100%;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--orange)}
+.form-textarea{resize:vertical;min-height:80px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{
+  position:absolute;inset:0;background:var(--border2);border-radius:11px;
+  cursor:pointer;transition:background 0.2s;
+}
+.toggle-slider::before{
+  content:'';position:absolute;height:16px;width:16px;
+  left:3px;bottom:3px;background:#fff;border-radius:50%;
+  transition:transform 0.2s;
+}
+.toggle input:checked+.toggle-slider{background:var(--orange)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px)}
+.form-actions{
+  display:flex;align-items:center;gap:10px;
+  padding:20px 0 0;border-top:1px solid var(--border);margin-top:10px;
+}
+.btn-save{
+  background:var(--orange);color:#fff;border:none;
+  padding:11px 24px;border-radius:8px;
+  font-size:0.88rem;font-weight:700;font-family:var(--font-head);
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-save:hover{background:#e55a1f}
+.btn-cancel{
+  background:none;color:var(--muted);border:1px solid var(--border);
+  padding:11px 20px;border-radius:8px;
+  font-size:0.88rem;font-family:var(--font-body);cursor:pointer;
+}
+.btn-cancel:hover{color:var(--text)}
+
+/* Enhanced Agents Grid Styles */
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.agent-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.agent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--orange), transparent);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.agent-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--orange);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.agent-card:hover::before {
+  transform: scaleX(1);
+}
+
+.agent-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.agent-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.agent-verified-badge {
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.agent-verified-badge.verified {
+  background: var(--green-dim);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.agent-verified-badge.unverified {
+  background: var(--yellow-dim);
+  color: var(--yellow);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.agent-info {
+  margin-bottom: 20px;
+}
+
+.agent-name {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.agent-contact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.contact-icon {
+  font-size: 0.85rem;
+}
+
+.contact-number {
+  font-family: monospace;
+  letter-spacing: 0.5px;
+}
+
+.agent-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.stars {
+  color: #fbbf24;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+.rating-value {
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--surface2);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.agent-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-card-mini {
+  text-align: center;
+}
+
+.stat-value-mini {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--orange);
+  margin-bottom: 4px;
+}
+
+.stat-label-mini {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted2);
+}
+
+.agent-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.agent-actions .btn-sm {
+  flex: 1;
+  justify-content: center;
+  padding: 6px 12px;
+  font-size: 0.7rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.empty-state .icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .agents-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .agent-stats-grid {
+    gap: 8px;
+  }
+  
+  .stat-value-mini {
+    font-size: 0.9rem;
+  }
+}
+
+/* Upload progress styles */
+.upload-progress-row {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 8px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.upload-progress-row .progress-bar {
+  background: var(--orange);
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+/* Video processing indicator */
+.video-processing {
+  position: relative;
+  overflow: hidden;
+}
+
+.video-processing::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,107,43,0.3), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    left: 100%;
+  }
+}
+
+/* Media Upload */
+.media-upload-zone{
+  border:2px dashed var(--border);border-radius:10px;
+  padding:28px;text-align:center;cursor:pointer;
+  transition:border-color 0.2s;background:var(--surface2);
+}
+.media-upload-zone:hover{border-color:var(--orange);background:var(--orange-dim)}
+.media-preview-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+  gap:10px;margin-top:14px;
+}
+.media-preview-item{
+  position:relative;border-radius:8px;overflow:hidden;
+  aspect-ratio:1;background:var(--surface3);
+}
+.media-preview-item img,.media-preview-item video{width:100%;height:100%;object-fit:cover}
+.media-preview-remove{
+  position:absolute;top:4px;right:4px;
+  background:rgba(239,68,68,0.85);color:#fff;border:none;
+  width:20px;height:20px;border-radius:50%;font-size:0.7rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+
+/* Agents Grid */
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.agent-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px;
+  transition:border-color 0.2s;
+}
+.agent-card:hover{border-color:rgba(255,107,43,0.3)}
+.agent-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--orange-dim);border:2px solid rgba(255,107,43,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-head);font-weight:800;color:var(--orange);font-size:1.05rem;
+}
+.agent-card-name{font-weight:700;font-family:var(--font-head);font-size:0.95rem}
+
+/* Toast & Confirm */
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--surface2);border:1px solid var(--border);
+  padding:10px 20px;border-radius:8px;font-size:0.82rem;
+  color:var(--text);opacity:0;transition:all 0.28s;z-index:9999;
+  pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.08)}
+.toast.error{border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.08)}
+.confirm-backdrop{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.2s;
+}
+.confirm-backdrop.open{opacity:1;pointer-events:all}
+.confirm-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:28px;width:100%;max-width:360px;text-align:center;
+}
+.confirm-actions{display:flex;gap:10px;justify-content:center;margin-top:20px}
+.btn-confirm-delete{
+  background:var(--red);color:#fff;border:none;
+  padding:9px 22px;border-radius:8px;font-size:0.86rem;font-weight:700;
+  cursor:pointer;
+}
+.btn-confirm-cancel{
+  background:none;color:var(--muted);border:1px solid var(--border);
+  padding:9px 22px;border-radius:8px;cursor:pointer;
+}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:0.7rem;font-weight:600;padding:2px 8px;border-radius:10px}
+.pill-green{background:var(--green-dim);color:#4ade80;border:1px solid rgba(37,211,102,0.2)}
+.tag{display:inline-flex;font-size:0.7rem;color:var(--muted);background:var(--surface3);border:1px solid var(--border);padding:2px 8px;border-radius:5px}
+</style>
+    </head>
+    <body>
+
+        <!-- Login Gate -->
+        <div id="loginGate">
+            <div class="login-box">
+                <div class="login-logo">Lodge<span>.</span></div>
+                <div class="login-sub">Admin Dashboard · Sign in to
+                    continue</div>
+                <label class="login-label">Password</label>
+                <input class="login-input" type="password" id="loginPass"
+                    placeholder="Enter admin password"
+                    onkeydown="if(event.key==='Enter')doLogin()" />
+                <button class="login-btn" onclick="doLogin()">Sign In</button>
+                <div class="login-error" id="loginError">Incorrect password. Try
+                    again.</div>
+                <div
+                    style="margin-top:16px;font-size:0.7rem;color:var(--muted2)">Demo
+                    password: <code
+                        style="color:var(--orange)">lodge2024</code></div>
+            </div>
+        </div>
+
+        <!-- Nav -->
+        <nav id="appNav" style="display:none">
+            <div style="display:flex;align-items:center;gap:0">
+                <div class="nav-logo">Lodge<span>.</span></div>
+                <span class="nav-badge">Admin</span>
+            </div>
+            <div class="nav-right">
+                <div class="convex-status">
+                    <div class="convex-dot" id="convexDot"></div>
+                    <span id="convexLabel"
+                        style="font-size:0.7rem;color:var(--muted2)">connecting…</span>
+                </div>
+                <a class="nav-link" href="#" target="_blank">← View Site</a>
+                <button class="logout-btn" onclick="doLogout()">Sign
+                    out</button>
+            </div>
+        </nav>
+
+        <!-- App Body -->
+        <div class="app" id="appBody" style="display:none">
+            <aside class="sidebar">
+                <div style="padding:14px 18px 10px">
+                    <div style="font-size:0.7rem;color:var(--muted2)">Logged in
+                        as</div>
+                    <div
+                        style="font-size:0.84rem;font-weight:600;margin-top:1px">Admin</div>
+                </div>
+                <div class="divider" style="margin:0 18px 14px"></div>
+                <div class="sidebar-section">
+                    <span class="sidebar-label">Content</span>
+                    <button class="sidebar-item active"
+                        onclick="showPage('dashboard',this)"><span
+                            class="icon">📊</span> Dashboard</button>
+                    <button class="sidebar-item"
+                        onclick="showPage('listings',this)"><span
+                            class="icon">🏠</span> Listings<span
+                            class="sidebar-count"
+                            id="sidebarListingCount">0</span></button>
+                    <button class="sidebar-item"
+                        onclick="showPage('add',this)"><span
+                            class="icon">➕</span> Add Listing</button>
+                    <button class="sidebar-item"
+                        onclick="showPage('agents',this)"><span
+                            class="icon">👤</span> Agents<span
+                            class="sidebar-count"
+                            id="sidebarAgentCount">0</span></button>
+                </div>
+            </aside>
+
+            <main class="main">
+                <!-- Dashboard -->
+                <div class="page active" id="page-dashboard">
+                    <div class="page-header">
+                        <div><div class="page-title">Dashboard</div><div
+                                class="page-sub">Overview of all Lodge
+                                listings</div></div>
+                        <button class="btn-add" onclick="showPage('add',null)">➕
+                            Add New Listing</button>
+                    </div>
+                    <div class="stats-bar">
+                        <div class="stat-card orange"><div
+                                class="stat-label">Total Listings</div><div
+                                class="stat-value" id="statTotal">0</div><div
+                                class="stat-sub">Across all areas</div></div>
+                        <div class="stat-card green"><div
+                                class="stat-label">Available Now</div><div
+                                class="stat-value" id="statAvail">0</div><div
+                                class="stat-sub">Immediate move-in</div></div>
+                        <div class="stat-card"><div class="stat-label">Total
+                                Views</div><div class="stat-value"
+                                id="statViews">0</div><div
+                                class="stat-sub">Across all listings</div></div>
+                        <div class="stat-card"><div class="stat-label">Active
+                                Agents</div><div class="stat-value"
+                                id="statAgents">0</div><div
+                                class="stat-sub">Registered on Lodge</div></div>
+                    </div>
+                    <div class="table-wrap" id="dashRecentTable"></div>
+                </div>
+
+                <!-- Listings -->
+                <div class="page" id="page-listings">
+                    <div class="page-header">
+                        <div><div class="page-title">All Listings</div><div
+                                class="page-sub" id="listingsSubtitle">0
+                                listings total</div></div>
+                        <button class="btn-add" onclick="showPage('add',null)">➕
+                            Add Listing</button>
+                    </div>
+                    <div class="table-wrap">
+                        <div class="table-toolbar">
+                            <div class="table-search"><span
+                                    style="color:var(--muted2);font-size:0.9rem">🔍</span><input
+                                    type="text" placeholder="Search listings…"
+                                    id="tableSearch"
+                                    oninput="renderListingsTable()" /></div>
+                            <div style="display:flex;gap:8px"
+                                id="tableFilterChips">
+                                <div class="pill pill-green"
+                                    style="cursor:pointer" data-filter="All"
+                                    onclick="setTableFilter('All',this)">All</div>
+                                <div class="pill"
+                                    style="cursor:pointer;background:var(--surface3)"
+                                    data-filter="active"
+                                    onclick="setTableFilter('active',this)">Active</div>
+                                <div class="pill"
+                                    style="cursor:pointer;background:var(--surface3)"
+                                    data-filter="draft"
+                                    onclick="setTableFilter('draft',this)">Draft</div>
+                            </div>
+                        </div>
+                        <div style="overflow-x:auto">
+                            <table><thead><tr><th></th><th>Title</th><th>Type</th><th>Area</th><th>Price</th><th>Agent</th><th>Availability</th><th>Status</th><th>Actions</th></tr></thead><tbody
+                                    id="listingsTableBody"></tbody></table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add/Edit Form -->
+                <div class="page" id="page-add">
+                    <div class="page-header"><div><div class="page-title"
+                                id="formPageTitle">Add New Listing</div><div
+                                class="page-sub" id="formPageSub">Fill in the
+                                details below</div></div><button
+                            class="btn-cancel"
+                            onclick="showPage('listings',null)">←
+                            Back</button></div>
+                    <div class="form-wrap">
+                        <div class="form-section">
+                            <div class="form-section-title">🏠 Basic
+                                Information</div>
+                            <div class="form-grid">
+                                <div class="form-group full"><label
+                                        class="form-label">Listing Title <span
+                                            class="req">*</span></label><input
+                                        type="text" class="form-input"
+                                        id="f_title" /></div>
+                                <div class="form-group"><label
+                                        class="form-label">Room
+                                        Type</label><select class="form-select"
+                                        id="f_type"><option
+                                            value="Single">Single</option><option
+                                            value="Self-Contain">Self-Contain</option><option
+                                            value="Shared">Shared</option><option
+                                            value="Flat">Flat</option></select></div>
+                                <div class="form-group"><label
+                                        class="form-label">Area</label><input
+                                        type="text" class="form-input"
+                                        id="f_area" /></div>
+                                <div class="form-group"><label
+                                        class="form-label">Size</label><select
+                                        class="form-select" id="f_size"><option
+                                            value="Small">Small</option><option
+                                            value="Medium"
+                                            selected>Medium</option><option
+                                            value="Large">Large</option></select></div>
+                                <div class="form-group"><label
+                                        class="form-label">Furnished</label><select
+                                        class="form-select"
+                                        id="f_furnished"><option
+                                            value="Not furnished">Not
+                                            furnished</option><option
+                                            value="Partially">Partially</option><option
+                                            value="Furnished">Furnished</option></select></div>
+                                <div class="form-group full"><label
+                                        class="form-label">Notes</label><textarea
+                                        class="form-textarea"
+                                        id="f_notes"></textarea></div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-section-title">💰 Pricing</div>
+                            <div class="form-grid">
+                                <div class="form-group"><label
+                                        class="form-label">Rent
+                                        (₦)</label><input type="number"
+                                        class="form-input" id="f_rent"
+                                        oninput="calcTotal()" /></div>
+                                <div class="form-group"><label
+                                        class="form-label">Agency
+                                        Fee</label><input type="number"
+                                        class="form-input" id="f_agency"
+                                        oninput="calcTotal()" /></div>
+                                <div class="form-group"><label
+                                        class="form-label">Legal
+                                        Fee</label><input type="number"
+                                        class="form-input" id="f_legal"
+                                        oninput="calcTotal()" /></div>
+                                <div class="form-group"><label
+                                        class="form-label">Caution</label><input
+                                        type="number" class="form-input"
+                                        id="f_caution"
+                                        oninput="calcTotal()" /></div>
+                            </div>
+                            <div
+                                style="background:var(--orange-dim);border-radius:8px;padding:12px;margin-top:12px;display:flex;justify-content:space-between"><span>Total
+                                    Move-in Cost</span><span id="f_total"
+                                    style="font-weight:800;color:var(--orange)">₦0</span></div>
+                            <div class="toggle-row"><div><div
+                                        class="toggle-label">Mark breakdown as
+                                        confirmed</div></div><label
+                                    class="toggle"><input type="checkbox"
+                                        id="f_breakdownConfirmed"
+                                        checked /><span
+                                        class="toggle-slider"></span></label></div>
+                            <div class="form-group"><label
+                                    class="form-label">Inspection
+                                    Fee</label><input type="text"
+                                    class="form-input" id="f_inspection"
+                                    placeholder="₦1,500" /></div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-section-title">📍 Location</div>
+                            <div class="form-grid cols3">
+                                <div class="form-group"><label
+                                        class="form-label">Distance
+                                        (min)</label><input type="number"
+                                        class="form-input"
+                                        id="f_distMin" /></div>
+                                <div class="form-group"><label
+                                        class="form-label">Distance
+                                        Label</label><input type="text"
+                                        class="form-input"
+                                        id="f_distLabel" /></div>
+                                <div class="form-group"><label
+                                        class="form-label">Mode
+                                        Label</label><input type="text"
+                                        class="form-input"
+                                        id="f_distMode" /></div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-section-title">✅ Amenities</div>
+                            <div class="toggle-row"><div><div
+                                        class="toggle-label">💧 Water
+                                        Supply</div></div><label
+                                    class="toggle"><input type="checkbox"
+                                        id="f_water" /><span
+                                        class="toggle-slider"></span></label></div>
+                            <div class="toggle-row"><div><div
+                                        class="toggle-label">⚡
+                                        Electricity</div></div><label
+                                    class="toggle"><input type="checkbox"
+                                        id="f_elec" /><span
+                                        class="toggle-slider"></span></label></div>
+                            <div class="toggle-row"><div><div
+                                        class="toggle-label">✓ Verified
+                                        Listing</div></div><label
+                                    class="toggle"><input type="checkbox"
+                                        id="f_verified" /><span
+                                        class="toggle-slider"></span></label></div>
+                            <div class="toggle-row"><div><div
+                                        class="toggle-label">Publish
+                                        (Active)</div></div><label
+                                    class="toggle"><input type="checkbox"
+                                        id="f_active" checked /><span
+                                        class="toggle-slider"></span></label></div>
+                            <div class="form-grid" style="margin-top:14px">
+                                <div class="form-group"><label
+                                        class="form-label">Security</label><input
+                                        type="text" class="form-input"
+                                        id="f_security" /></div>
+                                <div class="form-group"><label
+                                        class="form-label">Availability</label><select
+                                        class="form-select" id="f_avail"><option
+                                            value="Immediate">Immediate</option><option
+                                            value="Next Month">Next
+                                            Month</option></select></div>
+                                <div class="form-group"><label
+                                        class="form-label">Rooms
+                                        Left</label><input type="number"
+                                        class="form-input"
+                                        id="f_roomsLeft" /></div>
+                                <div class="form-group"><label
+                                        class="form-label">Badge</label><select
+                                        class="form-select" id="f_badge"><option
+                                            value>None</option><option
+                                            value="fire">🔥 Best
+                                            Value</option><option value="fast">⏳
+                                            Fast Filling</option><option
+                                            value="warn">⚠️
+                                            Overpriced</option></select></div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-section-title">👤 Agent</div>
+                            <div class="form-grid">
+                                <div class="form-group"><label
+                                        class="form-label">Select
+                                        Agent</label><select class="form-select"
+                                        id="f_agentId"></select></div>
+                                <div class="form-group"><button type="button"
+                                        class="btn-save-draft"
+                                        onclick="showPage('agents',null)">+ Add
+                                        New Agent</button></div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-section-title">📸 Media</div>
+                            <div class="media-upload-zone" id="mediaDropZone"
+                                onclick="document.getElementById('mediaFileInput').click()"
+                                ondragover="handleMediaDragOver(event)"
+                                ondrop="handleMediaDrop(event)">
+                                <div class="media-upload-icon">🖼️</div><div
+                                    class="media-upload-text">Click or drag to
+                                    upload</div>
+                            </div>
+                            <input type="file" id="mediaFileInput"
+                                accept="image/*,video/*" multiple
+                                style="display:none"
+                                onchange="handleMediaFiles(event)" />
+                            <div id="uploadProgressArea"></div>
+                            <div class="media-preview-grid"
+                                id="mediaPreviewGrid"></div>
+                            <div class="form-group"
+                                style="margin-top:10px"><input type="text"
+                                    class="form-input" id="f_imgUrl"
+                                    placeholder="Or paste image URL" /><button
+                                    class="btn-sm btn-edit"
+                                    onclick="addUrlMedia()">Add
+                                    Image</button></div>
+                            <div class="form-group"><input type="text"
+                                    class="form-input" id="f_videoUrl"
+                                    placeholder="Or paste video URL" /><button
+                                    class="btn-sm btn-edit"
+                                    onclick="addVideoMedia()">Add
+                                    Video</button></div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-save"
+                                onclick="saveListing(false)">💾 Save &
+                                Publish</button>
+                            <button class="btn-save-draft"
+                                onclick="saveListing(true)">Save as
+                                Draft</button>
+                            <button class="btn-cancel"
+                                onclick="showPage('listings',null)">Cancel</button>
+                            <span class="save-status" id="saveStatus"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agents -->
+                <div class="page" id="page-agents">
+                    <div class="page-header"><div><div
+                                class="page-title">Agents</div><div
+                                class="page-sub">Manage registered
+                                agents</div></div><button class="btn-add"
+                            onclick="openAddAgentForm()">➕ Add
+                            Agent</button></div>
+                    <div class="agents-grid" id="agentsGrid"></div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Modals -->
+        <div class="confirm-backdrop" id="agentFormBackdrop"><div
+                class="confirm-box" style="max-width:420px;text-align:left"><div
+                    style="font-weight:700;margin-bottom:16px">➕ Add
+                    Agent</div><div class="form-group"><label
+                        class="form-label">Full Name</label><input type="text"
+                        class="form-input" id="ag_name" /></div><div
+                    class="form-group"><label
+                        class="form-label">Phone</label><input type="text"
+                        class="form-input" id="ag_phone" /></div><div
+                    class="toggle-row"><div><div class="toggle-label">Verified
+                            Agent</div></div><label class="toggle"><input
+                            type="checkbox" id="ag_verified" checked /><span
+                            class="toggle-slider"></span></label></div><div
+                    class="confirm-actions"><button class="btn-confirm-delete"
+                        style="background:var(--orange)"
+                        onclick="saveAgent()">Save</button><button
+                        class="btn-confirm-cancel"
+                        onclick="closeAgentForm()">Cancel</button></div></div></div>
+        <div class="confirm-backdrop" id="confirmDelete"><div
+                class="confirm-box"><div class="confirm-icon">🗑️</div><div
+                    class="confirm-title">Delete Listing?</div><div
+                    class="confirm-msg" id="confirmDeleteMsg"></div><div
+                    class="confirm-actions"><button class="btn-confirm-delete"
+                        id="confirmDeleteBtn">Delete</button><button
+                        class="btn-confirm-cancel"
+                        onclick="closeConfirmDelete()">Cancel</button></div></div></div>
+        <div class="toast" id="toast"></div>
+
+        <script>
+// Configuration
+const DEFAULT_PASS = 'working';
+let CLOUDINARY_CLOUD_NAME = 'do1jh1eac';
+let CLOUDINARY_UPLOAD_PRESET = 'nmhlfto6';
+
+let convexClient = null;
+let isConvexConnected = false;
+let allListings = [];
+let allAgents = [];
+
+// Form state
+let editingId = null;
+let formMediaItems = [];
+
+// Helper functions
+const fmt = n => '₦' + Number(n).toLocaleString('en-NG');
+
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Convex Setup
+async function initConvex() {
+  try {
+    
+    const CONVEX_URL = "https://youthful-wildebeest-612.convex.cloud";
+    convexClient = new convex.ConvexClient(CONVEX_URL);
+    
+    const listingsQuery = convexClient.query('listings:getListings');
+    const agentsQuery = convexClient.query('agents:getAgents');
+    
+    const [listings, agents] = await Promise.all([listingsQuery, agentsQuery]);
+
+    console.log(listings)
+    allListings = listings.listings || [];
+    allAgents = agents || [];
+
+    isConvexConnected = true;
+    document.getElementById('convexDot').classList.add('live');
+    document.getElementById('convexLabel').textContent = 'live';
+    
+    updateStats();
+    renderListingsTable();
+    renderAgentsGrid();
+    renderAgentSelect();
+    renderDashRecent();
+    
+    convexClient.onUpdate("listings:getListings", {}, (listings) => {
+      console.log('Listings updated:', listings);
+      allListings = listings?.listings || [];
+      updateStats();
+      renderListingsTable();
+      renderDashRecent();
+    });
+    
+    convexClient.onUpdate("agents:getAgents", {}, (agents) => {
+      console.log('Agents updated:', agents.length);
+      allAgents = agents || [];
+      renderAgentsGrid();
+      renderAgentSelect();
+      updateStats();
+    });
+
+    window.convexClient = convexClient;
+    
+  } catch (error) {
+    console.error('Failed to connect to Convex:', error);
+    document.getElementById('convexLabel').textContent = 'offline (demo mode)';
+    toast('Using demo mode - Convex connection failed', 'error');
+    
+    // Fallback to localStorage demo data
+    loadDemoData();
+  }
+}
+
+function loadDemoData() {
+  allListings = [
+    {_id:"demo1", title:"Single Room — Maryland", type:"Single", area:"Maryland", price:300000, distMin:5, distLabel:"5 min walk", distMode:"🚶 5 min walk", water:true, elec:true, availability:"Immediate", daysAgo:1, views:14, roomsLeftConfirmed:2, badge:"fire", badgeLabel:"Best Value 🔥", verified:true, agentId:"a1", img:"https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=600&q=80", videoUrl:null, inspectionFee:"₦1,500", breakdown:{rent:180000, agency:60000, legal:30000, caution:30000}, breakdownConfirmed:true, notes:"Great location", size:"Medium", furnished:"Partially", security:"Caretaker", status:"active"},
+  ];
+  allAgents = [
+    {_id:"a1", name:"Emeka Obi", phone:"2348012345678", listings:1, rating:"4.8 ⭐", verified:true},
+  ];
+  updateStats();
+  renderListingsTable();
+  renderAgentsGrid();
+  renderAgentSelect();
+  renderDashRecent();
+}
+
+// Dashboard functions
+function updateStats() {
+  const activeListings = allListings?.filter(l => l.status !== 'draft');
+  const immediateAvail = activeListings?.filter(l => l.availability === 'Immediate');
+  const totalViews = allListings?.reduce((sum, l) => sum + (l.views || 0), 0);
+  
+  document.getElementById('statTotal').textContent = allListings.length;
+  document.getElementById('statAvail').textContent = immediateAvail.length;
+  document.getElementById('statViews').textContent = totalViews;
+  document.getElementById('statAgents').textContent = allAgents.length;
+  document.getElementById('sidebarListingCount').textContent = allListings.length;
+  document.getElementById('sidebarAgentCount').textContent = allAgents.length;
+  document.getElementById('listingsSubtitle').textContent = `${allListings.length} listings total`;
+}
+
+function renderAgentSelect() {
+  const sel = document.getElementById('f_agentId');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Choose agent…</option>';
+  allAgents.forEach(a => {
+    sel.innerHTML += `<option value="${a._id}">${a.name} ${a.verified ? '✓' : ''}</option>`;
+  });
+}
+
+let tableFilter = 'All';
+function setTableFilter(f, el) {
+  tableFilter = f;
+  document.querySelectorAll('#tableFilterChips .pill').forEach(p => {
+    p.className = 'pill';
+    p.style.background = 'var(--surface3)';
+  });
+  el.className = 'pill pill-green';
+  renderListingsTable();
+}
+
+// View agent details
+function viewAgentDetails(agentId) {
+  const agent = allAgents.find(a => a._id === agentId);
+  if (!agent) return;
+  
+  const listings = allListings.filter(l => l.agentId === agentId);
+  const totalViews = listings.reduce((s, l) => s + (l.views || 0), 0);
+  const totalRevenue = listings.reduce((s, l) => s + (l.price || 0), 0);
+  
+  toast(`
+    ${agent.name}\n
+    Listings: ${listings.length}\n
+    Total Views: ${totalViews}\n
+    Total Revenue: ${formatCurrency(totalRevenue)}
+  `, 'info');
+}
+
+// View agent's listings
+function viewAgentListings(agentId) {
+  const agent = allAgents.find(a => a._id === agentId);
+  if (agent) {
+    // Filter listings table to show only this agent's listings
+    setTableFilter('All', document.querySelector('#tableFilterChips .pill-green'));
+    document.getElementById('tableSearch').value = agent.name;
+    renderListingsTable();
+    showPage('listings', null);
+    toast(`Showing listings for ${agent.name}`, 'success');
+  }
+}
+
+// Edit agent
+function editAgent(agentId) {
+  const agent = allAgents.find(a => a._id === agentId);
+  if (!agent) return;
+  
+  openAddAgentForm();
+  document.getElementById('ag_name').value = agent.name;
+  document.getElementById('ag_phone').value = agent.phone || '';
+  document.getElementById('ag_verified').checked = agent.verified;
+  
+  // Store for update instead of create
+  window.editingAgentId = agentId;
+  
+  // Change save button behavior
+  const saveBtn = document.querySelector('#agentFormBackdrop .btn-confirm-delete');
+  saveBtn.textContent = 'Update Agent';
+  saveBtn.onclick = () => updateAgent(agentId);
+}
+
+// Update agent
+async function updateAgent(agentId) {
+  const data = {
+    name: document.getElementById('ag_name').value,
+    phone: document.getElementById('ag_phone').value,
+    verified: document.getElementById('ag_verified').checked,
+  };
+  
+  try {
+    if (window.convexClient) {
+      await window.convexClient.mutation("agents:updateAgent", { id: agentId, ...data });
+      toast('Agent updated!', 'success');
+    } else {
+      const index = allAgents.findIndex(a => a._id === agentId);
+      if (index > -1) {
+        allAgents[index] = { ...allAgents[index], ...data };
+        renderAgentsGrid();
+        renderAgentSelect();
+        toast('Agent updated (demo mode)', 'success');
+      }
+    }
+    closeAgentForm();
+    window.editingAgentId = null;
+  } catch (error) {
+    console.error('Error updating agent:', error);
+    toast('Error updating agent', 'error');
+  }
+}
+
+function renderListingsTable() {
+  const searchTerm = document.getElementById('tableSearch')?.value.toLowerCase() || '';
+  const filtered = allListings?.filter(l => {
+    if (tableFilter !== 'All' && l.status !== tableFilter) return false;
+    if (searchTerm && !l.title.toLowerCase().includes(searchTerm) && !l.area.toLowerCase().includes(searchTerm)) return false;
+    return true;
+  });
+  
+  const tbody = document.getElementById('listingsTableBody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px">No listings found</td></tr>`;
+    return;
+  }
+  
+  tbody.innerHTML = filtered.map(l => {
+    const agent = allAgents.find(a => a._id === l.agentId);
+    const statusHtml = l.status === 'active' 
+      ? '<span class="td-badge active">Active</span>' 
+      : '<span class="td-badge draft">Draft</span>';
+    return `
+      <tr>
+        <td>${l.img ? `<img class="thumb" src="${l.img}" loading="lazy"/>` : '<div class="thumb-placeholder">No img</div>'}</td>
+        <td><div class="td-title">${l.title}</div></td>
+        <td><span class="tag">${l.type}</span></td>
+        <td class="td-muted">${l.area}</td>
+        <td class="td-price">${fmt(l.price)}</td>
+        <td class="td-muted">${agent?.name || '—'}</td>
+        <td class="td-muted">${l.availability}</td>
+        <td>${statusHtml}</td>
+        <td><div class="td-actions"><button class="btn-sm btn-edit" onclick="editListing('${l._id}')">✏️ Edit</button><button class="btn-sm btn-delete" onclick="confirmDeleteListing('${l._id}')">🗑️</button></div></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderDashRecent() {
+  const recent = [...allListings].sort((a,b) => (b._creationTime || 0) - (a._creationTime || 0)).slice(0,5);
+  document.getElementById('dashRecentTable').innerHTML = `
+    <div style="overflow-x:auto"><table><thead><tr><th></th><th>Title</th><th>Type</th><th>Price</th><th>Agent</th><th>Status</th></tr></thead><tbody>
+      ${recent.map(l => {
+        const agent = allAgents.find(a => a._id === l.agentId);
+        return `<tr onclick="editListing('${l._id}')"><td>${l.img ? `<img class="thumb" src="${l.img}"/>` : '<div class="thumb-placeholder">—</div>'}</td>
+        <td class="td-title">${l.title}</td><td><span class="tag">${l.type}</span></td>
+        <td class="td-price">${fmt(l.price)}</td><td class="td-muted">${agent?.name || '—'}</td>
+        <td><span class="td-badge ${l.status}">${l.status}</span></td></tr>`;
+      }).join('')}
+    </tbody></table></div>`;
+}
+
+function renderAgentsGrid() {
+  const grid = document.getElementById('agentsGrid');
+  if (!allAgents.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">👥</div>
+        <p>No agents yet</p>
+        <button class="btn-add" onclick="openAddAgentForm()" style="margin-top: 16px;">➕ Add Your First Agent</button>
+      </div>
+    `;
+    return;
+  }
+  
+  grid.innerHTML = allAgents.map(ag => {
+    const agentListings = allListings?.filter(l => l.agentId === ag._id) || [];
+    const totalViews = agentListings.reduce((s, l) => s + (l.views || 0), 0);
+    const totalRevenue = agentListings.reduce((s, l) => s + (l.price || 0), 0);
+    
+    return `
+      <div class="agent-card" onclick="viewAgentDetails('${ag._id}')">
+        <div class="agent-card-header">
+          <div class="agent-avatar" style="background: ${getRandomGradient(ag._id)}">
+            ${ag.name.charAt(0).toUpperCase()}
+          </div>
+          <div class="agent-verified-badge ${ag.verified ? 'verified' : 'unverified'}">
+            ${ag.verified ? '✓ Verified' : '⏳ Pending'}
+          </div>
+        </div>
+        
+        <div class="agent-info">
+          <h3 class="agent-name">${escapeHtml(ag.name)}</h3>
+          <div class="agent-contact">
+            <span class="contact-icon">📞</span>
+            <span class="contact-number">${formatPhoneNumber(ag.phone)}</span>
+          </div>
+          <div class="agent-rating">
+            <span class="stars">${getRatingStars(ag.rating)}</span>
+            <span class="rating-value">${ag.rating || '4.5 ⭐'}</span>
+          </div>
+        </div>
+        
+        <div class="agent-stats-grid">
+          <div class="stat-card-mini">
+            <div class="stat-value-mini">${agentListings.length}</div>
+            <div class="stat-label-mini">Listings</div>
+          </div>
+          <div class="stat-card-mini">
+            <div class="stat-value-mini">${totalViews.toLocaleString()}</div>
+            <div class="stat-label-mini">Views</div>
+          </div>
+          <div class="stat-card-mini">
+            <div class="stat-value-mini">${formatCurrency(totalRevenue)}</div>
+            <div class="stat-label-mini">Revenue</div>
+          </div>
+        </div>
+        
+        <div class="agent-actions">
+          <button class="btn-sm btn-edit" onclick="editAgent('${ag._id}'); event.stopPropagation();">
+            ✏️ Edit
+          </button>
+          <button class="btn-sm btn-view" onclick="viewAgentListings('${ag._id}'); event.stopPropagation();">
+            📋 View Listings
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Helper functions for better design
+function getRandomGradient(id) {
+  const gradients = [
+    'linear-gradient(135deg, #ff6b2b, #ff8c42)',
+    'linear-gradient(135deg, #4ade80, #22c55e)',
+    'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+    'linear-gradient(135deg, #f59e0b, #d97706)',
+    'linear-gradient(135deg, #ef4444, #dc2626)',
+    'linear-gradient(135deg, #06b6d4, #0891b2)'
+  ];
+  const index = parseInt(id.replace(/\D/g, '')) % gradients.length;
+  return gradients[index];
+}
+
+function getRatingStars(ratingStr) {
+  const rating = parseFloat(ratingStr) || 4.5;
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  let stars = '';
+  for (let i = 0; i < fullStars; i++) stars += '★';
+  if (hasHalfStar) stars += '½';
+  for (let i = stars.length; i < 5; i++) stars += '☆';
+  return stars;
+}
+
+function formatPhoneNumber(phone) {
+  if (!phone) return '—';
+  // Format Nigerian phone numbers
+  if (phone.startsWith('234')) {
+    return `+${phone.slice(0, 3)} ${phone.slice(3, 6)} ${phone.slice(6, 10)}`;
+  }
+  return phone;
+}
+
+function formatCurrency(amount) {
+  if (amount === 0) return '₦0';
+  if (amount > 1000000) return `₦${(amount / 1000000).toFixed(1)}M`;
+  if (amount > 1000) return `₦${(amount / 1000).toFixed(0)}K`;
+  return `₦${amount.toLocaleString()}`;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+
+// Listing CRUD with Convex
+async function saveListing(isDraft = false) {
+  const data = {
+    title: document.getElementById('f_title').value,
+    type: document.getElementById('f_type').value,
+    area: document.getElementById('f_area').value,
+    price: (parseInt(document.getElementById('f_rent').value) || 0) +
+           (parseInt(document.getElementById('f_agency').value) || 0) +
+           (parseInt(document.getElementById('f_legal').value) || 0) +
+           (parseInt(document.getElementById('f_caution').value) || 0),
+    distMin: parseInt(document.getElementById('f_distMin').value) || 0,
+    distLabel: document.getElementById('f_distLabel').value,
+    distMode: document.getElementById('f_distMode').value,
+    water: document.getElementById('f_water').checked,
+    elec: document.getElementById('f_elec').checked,
+    availability: document.getElementById('f_avail').value,
+    daysAgo: 0,
+    views: 0,
+    roomsLeftConfirmed: document.getElementById('f_roomsLeft').value ? parseInt(document.getElementById('f_roomsLeft').value) : null,
+    badge: document.getElementById('f_badge').value || null,
+    badgeLabel: document.getElementById('f_badge').value === 'fire' ? 'Best Value 🔥' : 
+                 document.getElementById('f_badge').value === 'fast' ? 'Fast Filling ⏳' :
+                 document.getElementById('f_badge').value === 'warn' ? 'Overpriced ⚠️' : null,
+    verified: document.getElementById('f_verified').checked,
+    agentId: document.getElementById('f_agentId').value,
+    img: formMediaItems.find(m => m.type === 'image')?.url || '',
+    videoUrl: formMediaItems.find(m => m.type === 'video')?.url || null,
+    inspectionFee: document.getElementById('f_inspection').value || '₦1,500',
+    breakdown: {
+      rent: parseInt(document.getElementById('f_rent').value) || 0,
+      agency: parseInt(document.getElementById('f_agency').value) || 0,
+      legal: parseInt(document.getElementById('f_legal').value) || 0,
+      caution: parseInt(document.getElementById('f_caution').value) || 0,
+    },
+    breakdownConfirmed: document.getElementById('f_breakdownConfirmed').checked,
+    notes: document.getElementById('f_notes').value,
+    size: document.getElementById('f_size').value,
+    furnished: document.getElementById('f_furnished').value,
+    security: document.getElementById('f_security').value,
+    status: isDraft ? 'draft' : (document.getElementById('f_active').checked ? 'active' : 'draft'),
+  };
+  
+  if (!data.title || !data.type || !data.area || !data.agentId) {
+    toast('Please fill all required fields', 'error');
+    return;
+  }
+  
+  document.getElementById('saveStatus').textContent = 'Saving...';
+  
+  try {
+    if (editingId && convexClient) {
+      await convexClient.mutation('listings:updateListing', { id: editingId, ...data });
+      toast('Listing updated!', 'success');
+    } else if (convexClient) {
+      await convexClient.mutation('listings:addListing', data);
+      toast('Listing published!', 'success');
+    } else {
+      // Demo mode
+      if (editingId) {
+        const idx = allListings.findIndex(l => l._id === editingId);
+        if (idx > -1) allListings[idx] = { ...allListings[idx], ...data };
+      } else {
+        data._id = 'demo' + Date.now();
+        allListings.unshift(data);
+      }
+      toast('Listing saved (demo mode)', 'success');
+    }
+    
+    resetForm();
+    showPage('listings', null);
+    if (!convexClient) {
+      updateStats();
+      renderListingsTable();
+      renderDashRecent();
+    }
+  } catch (error) {
+    console.error('Save error:', error);
+    toast('Error saving listing', 'error');
+  } finally {
+    document.getElementById('saveStatus').textContent = '';
+  }
+}
+
+function editListing(id) {
+  const l = allListings.find(x => x._id === id);
+  if (!l) return;
+  
+  editingId = id;
+  showPage('add', null);
+  document.getElementById('formPageTitle').textContent = 'Edit Listing';
+  document.getElementById('formPageSub').textContent = `Editing: ${l.title}`;
+  
+  document.getElementById('f_title').value = l.title || '';
+  document.getElementById('f_type').value = l.type || '';
+  document.getElementById('f_area').value = l.area || '';
+  document.getElementById('f_distMin').value = l.distMin || '';
+  document.getElementById('f_distLabel').value = l.distLabel || '';
+  document.getElementById('f_distMode').value = l.distMode || '';
+  document.getElementById('f_notes').value = l.notes || '';
+  document.getElementById('f_security').value = l.security || '';
+  document.getElementById('f_size').value = l.size || 'Medium';
+  document.getElementById('f_furnished').value = l.furnished || 'Not furnished';
+  document.getElementById('f_avail').value = l.availability || 'Immediate';
+  document.getElementById('f_badge').value = l.badge || '';
+  document.getElementById('f_agentId').value = l.agentId || '';
+  document.getElementById('f_water').checked = !!l.water;
+  document.getElementById('f_elec').checked = !!l.elec;
+  document.getElementById('f_verified').checked = !!l.verified;
+  document.getElementById('f_active').checked = l.status !== 'draft';
+  document.getElementById('f_breakdownConfirmed').checked = !!l.breakdownConfirmed;
+  document.getElementById('f_inspection').value = l.inspectionFee || '';
+  document.getElementById('f_roomsLeft').value = l.roomsLeftConfirmed || '';
+  
+  if (l.breakdown) {
+    document.getElementById('f_rent').value = l.breakdown.rent || '';
+    document.getElementById('f_agency').value = l.breakdown.agency || '';
+    document.getElementById('f_legal').value = l.breakdown.legal || '';
+    document.getElementById('f_caution').value = l.breakdown.caution || '';
+  }
+  calcTotal();
+  
+  formMediaItems = [];
+  if (l.img) formMediaItems.push({ type: 'image', url: l.img });
+  if (l.videoUrl) formMediaItems.push({ type: 'video', url: l.videoUrl });
+  renderMediaPreviews();
+}
+
+async function confirmDeleteListing(id) {
+  const l = allListings.find(x => x._id === id);
+  document.getElementById('confirmDeleteMsg').textContent = `Delete "${l?.title}"? This cannot be undone.`;
+  document.getElementById('confirmDeleteBtn').onclick = async () => {
+    if (convexClient) {
+      await convexClient.mutation('listings:deleteListing', { id });
+      toast('Listing deleted', 'error');
+    } else {
+      allListings = allListings.filter(x => x._id !== id);
+      updateStats();
+      renderListingsTable();
+      renderDashRecent();
+      toast('Listing deleted (demo mode)', 'error');
+    }
+    closeConfirmDelete();
+  };
+  document.getElementById('confirmDelete').classList.add('open');
+}
+
+function closeConfirmDelete() {
+  document.getElementById('confirmDelete').classList.remove('open');
+}
+
+// Agent CRUD
+async function saveAgent() {
+  const name = document.getElementById('ag_name').value.trim();
+  if (!name) {
+    toast('Agent name required', 'error');
+    return;
+  }
+  
+  const agentData = {
+    name: name,
+    phone: document.getElementById('ag_phone').value.trim(),
+    verified: document.getElementById('ag_verified').checked,
+  };
+
+  console.log(agentData)
+  
+  try {
+    if (convexClient) {
+      await convexClient.mutation('agents:addAgent', agentData);
+      toast('Agent added!', 'success');
+    } else {
+      const id = 'a' + Date.now();
+      allAgents.push({ _id: id, ...agentData });
+      toast('Agent added (demo mode)', 'success');
+      renderAgentsGrid();
+      renderAgentSelect();
+      updateStats();
+    }
+    closeAgentForm();
+  } catch (error) {
+    console.error('Error adding agent:', error);
+    toast('Error adding agent', 'error');
+  }
+}
+
+function openAddAgentForm() {
+  document.getElementById('ag_name').value = '';
+  document.getElementById('ag_phone').value = '';
+  document.getElementById('ag_verified').checked = true;
+  document.getElementById('agentFormBackdrop').classList.add('open');
+}
+
+function closeAgentForm() {
+  document.getElementById('agentFormBackdrop').classList.remove('open');
+}
+
+// Form helpers
+function resetForm() {
+  editingId = null;
+  formMediaItems = [];
+  document.getElementById('formPageTitle').textContent = 'Add New Listing';
+  document.getElementById('formPageSub').textContent = 'Fill in the details below';
+  document.querySelectorAll('#page-add input, #page-add select, #page-add textarea').forEach(el => {
+    if (el.type !== 'checkbox') el.value = '';
+    else el.checked = false;
+  });
+  document.getElementById('f_active').checked = true;
+  document.getElementById('f_breakdownConfirmed').checked = true;
+  document.getElementById('f_size').value = 'Medium';
+  document.getElementById('f_furnished').value = 'Not furnished';
+  document.getElementById('f_avail').value = 'Immediate';
+  calcTotal();
+  renderMediaPreviews();
+}
+
+function calcTotal() {
+  const rent = parseInt(document.getElementById('f_rent').value) || 0;
+  const agency = parseInt(document.getElementById('f_agency').value) || 0;
+  const legal = parseInt(document.getElementById('f_legal').value) || 0;
+  const caution = parseInt(document.getElementById('f_caution').value) || 0;
+  document.getElementById('f_total').textContent = fmt(rent + agency + legal + caution);
+}
+
+// Media handling
+function renderMediaPreviews() {
+  const grid = document.getElementById('mediaPreviewGrid');
+  if (!formMediaItems.length) {
+    grid.innerHTML = '';
+    return;
+  }
+  grid.innerHTML = formMediaItems.map((m, i) => `
+    <div class="media-preview-item">
+      ${m.type === 'video' ? `<video src="${m.url}" muted style="width:100%;height:100%;object-fit:cover"></video>` : `<img src="${m.url}" loading="lazy"/>`}
+      <button class="media-preview-remove" onclick="removeMedia(${i})">✕</button>
+      <span class="media-preview-type">${m.type === 'video' ? '▶ Video' : '📷'}</span>
+    </div>
+  `).join('');
+}
+
+function removeMedia(idx) {
+  formMediaItems.splice(idx, 1);
+  renderMediaPreviews();
+}
+
+function addUrlMedia() {
+  const url = document.getElementById('f_imgUrl').value.trim();
+  if (url) {
+    formMediaItems.unshift({ type: 'image', url });
+    document.getElementById('f_imgUrl').value = '';
+    renderMediaPreviews();
+    toast('Image added', 'success');
+  }
+}
+
+function addVideoMedia() {
+  const url = document.getElementById('f_videoUrl').value.trim();
+  if (url) {
+    formMediaItems.push({ type: 'video', url });
+    document.getElementById('f_videoUrl').value = '';
+    renderMediaPreviews();
+    toast('Video added', 'success');
+  }
+}
+
+function handleMediaDragOver(e) {
+  e.preventDefault();
+  document.getElementById('mediaDropZone').classList.add('dragging');
+}
+
+function handleMediaDrop(e) {
+  e.preventDefault();
+  document.getElementById('mediaDropZone').classList.remove('dragging');
+  const files = Array.from(e.dataTransfer.files);
+  files.forEach(f => uploadMedia(f, 'form'));
+}
+
+function handleMediaFiles(e) {
+  const files = Array.from(e.target.files);
+  files.forEach(f => uploadMedia(f, 'form'));
+}
+
+function uploadMedia(file, context) {
+  const isVideo = file.type.startsWith('video/');
+  
+  // Check file size (max 100MB for videos)
+  const maxSize = isVideo ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
+  if (file.size > maxSize) {
+    toast(`File too large! Max ${isVideo ? '100MB' : '10MB'}`, 'error');
+    return;
+  }
+  
+  // Show upload progress UI
+  const progressArea = context === 'form' 
+    ? document.getElementById('uploadProgressArea') 
+    : document.getElementById('standaloneProgressArea');
+  
+  let progId = null;
+  if (progressArea) {
+    progId = 'prog_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    progressArea.innerHTML += `
+      <div class="upload-progress-row" id="${progId}" style="background: var(--surface2); border-radius: 8px; padding: 10px; margin-top: 8px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span style="font-size: 0.75rem; color: var(--text);">${file.name.substring(0, 40)}${file.name.length > 40 ? '...' : ''}</span>
+          <span style="font-size: 0.7rem; color: var(--muted);" id="pct_${progId}">0%</span>
+        </div>
+        <div style="background: var(--border); border-radius: 4px; height: 4px; overflow: hidden;">
+          <div style="background: var(--orange); height: 100%; width: 0%; transition: width 0.3s;" id="bar_${progId}"></div>
+        </div>
+        <div style="font-size: 0.65rem; color: var(--muted2); margin-top: 4px;">
+          ${isVideo ? '🎬 Uploading video...' : '🖼️ Uploading image...'}
+        </div>
+      </div>
+    `;
+  }
+  
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', 'lodgee'); // Your preset name
+  fd.append('folder', 'lodgee'); // Your folder name
+  
+  // Optional: Add tags for organization
+  fd.append('tags', 'lodge,listing_media');
+  
+  // Add context data
+  fd.append('context', `source=lodge_admin|file_type=${isVideo ? 'video' : 'image'}`);
+  
+  // Note: unique_filename is true by default in your preset, so no need to set it
+  // overwrite: false is also set in your preset
+  
+  const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
+  
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', url);
+  
+  // Track upload progress
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable && progId) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      const bar = document.getElementById(`bar_${progId}`);
+      const pct = document.getElementById(`pct_${progId}`);
+      if (bar) bar.style.width = percent + '%';
+      if (pct) pct.textContent = percent + '%';
+    }
+  };
+  
+  xhr.onload = () => {
+    // Remove progress indicator
+    if (progId) {
+      const progEl = document.getElementById(progId);
+      if (progEl) progEl.remove();
+    }
+    
+    try {
+      const res = JSON.parse(xhr.responseText);
+      
+      if (res.secure_url) {
+        let finalUrl = res.secure_url;
+        
+        if (context === 'form') {
+          if (isVideo) {
+            formMediaItems.push({ type: 'video', url: finalUrl });
+            toast('📹 Video uploaded! Ready for listing.', 'success');
+          } else {
+            formMediaItems.unshift({ type: 'image', url: finalUrl });
+            toast('🖼️ Image uploaded!', 'success');
+          }
+          renderMediaPreviews();
+        } else if (context === 'standalone') {
+          showStandaloneResult(finalUrl, isVideo);
+        } else {
+          showUploadResult(finalUrl, isVideo);
+        }
+        
+        console.log('✅ Uploaded to Cloudinary:', finalUrl);
+        console.log('Public ID:', res.public_id);
+        console.log('Folder:', res.folder);
+        
+      } else {
+        let errorMsg = res.error?.message || 'Upload failed';
+        
+        // Friendly error messages
+        if (errorMsg.includes('upload preset')) {
+          errorMsg = 'Upload preset "lodgee" not found or not configured properly.';
+        } else if (errorMsg.includes('unsigned')) {
+          errorMsg = 'Upload preset must be set to unsigned mode.';
+        }
+        
+        toast(`Upload failed: ${errorMsg}`, 'error');
+        console.error('Cloudinary error:', res.error);
+      }
+    } catch (err) {
+      toast('Upload error: Invalid response from server', 'error');
+      console.error('Parse error:', err);
+    }
+  };
+  
+  xhr.onerror = () => {
+    if (progId) {
+      const progEl = document.getElementById(progId);
+      if (progEl) progEl.remove();
+    }
+    toast('Network error during upload. Please check your connection.', 'error');
+  };
+  
+  // Add timeout for large files
+  xhr.timeout = isVideo ? 180000 : 60000;
+  xhr.ontimeout = () => {
+    if (progId) {
+      const progEl = document.getElementById(progId);
+      if (progEl) progEl.remove();
+    }
+    toast('Upload timeout. File may be too large.', 'error');
+  };
+  
+  xhr.send(fd);
+}
+
+// Helper function for standalone upload result display
+function showStandaloneResult(url, isVideo) {
+  const resultArea = document.getElementById('standaloneResults');
+  if (!resultArea) return;
+  
+  resultArea.innerHTML = `
+    <div style="background: var(--surface2); border-radius: 8px; padding: 12px; margin-top: 12px;">
+      ${isVideo 
+        ? `<video src="${url}" controls style="width: 100%; border-radius: 6px; margin-bottom: 10px; max-height: 180px;"></video>`
+        : `<img src="${url}" style="width: 100%; border-radius: 6px; margin-bottom: 10px; max-height: 180px; object-fit: cover;">`
+      }
+      <div style="display: flex; gap: 8px; margin-top: 8px;">
+        <input type="text" value="${url}" readonly style="flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 0.7rem; color: var(--text); font-family: monospace;">
+        <button class="btn-sm btn-edit" onclick="navigator.clipboard.writeText('${url}').then(()=>toast('Copied!','success'))">Copy</button>
+      </div>
+      <div style="font-size: 0.7rem; color: var(--muted); margin-top: 8px;">
+        ${isVideo ? '🎬 Video URL ready for use in listings' : '🖼️ Image URL ready for use in listings'}
+      </div>
+    </div>
+  `;
+}
+
+// Helper function for upload modal result
+function showUploadResult(url, isVideo) {
+  const resultEl = document.getElementById('uploadResult');
+  const previewImg = document.getElementById('uploadResultPreview');
+  const previewVideo = document.getElementById('uploadResultVideo');
+  const resultUrl = document.getElementById('uploadResultUrl');
+  
+  if (!resultEl) return;
+  
+  resultEl.style.display = 'block';
+  resultUrl.textContent = url;
+  
+  if (isVideo) {
+    previewImg.style.display = 'none';
+    previewVideo.style.display = 'block';
+    previewVideo.src = url;
+  } else {
+    previewVideo.style.display = 'none';
+    previewImg.style.display = 'block';
+    previewImg.src = url;
+  }
+}
+
+// Enhanced version with WhatsApp video optimization
+function uploadWhatsAppVideo(file, context) {
+  // Check if it's a WhatsApp video (often has specific MIME types)
+  const isWhatsAppVideo = file.type === 'video/mp4' || file.type === 'video/3gpp' || file.name.includes('WA');
+  
+  if (isWhatsAppVideo) {
+    toast('📱 WhatsApp video detected. Optimizing for web...', 'info');
+  }
+  
+  uploadMedia(file, context);
+}
+
+// Navigation
+function showPage(id, triggerEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  if (triggerEl) triggerEl.classList.add('active');
+  if (id === 'add') resetForm();
+  window.scrollTo({ top: 0 });
+}
+
+// Auth
+function getStoredPass() {
+  return DEFAULT_PASS;
+}
+
+function doLogin() {
+  const pass = document.getElementById('loginPass').value;
+  if (pass === getStoredPass()) {
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('appNav').style.display = 'flex';
+    document.getElementById('appBody').style.display = 'flex';
+    initConvex();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  document.getElementById('loginGate').style.display = 'flex';
+  document.getElementById('appNav').style.display = 'none';
+  document.getElementById('appBody').style.display = 'none';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+}
+
+// Load saved Cloudinary config
+const savedCloud = 'do1jh1eac';
+const savedPreset = 'nmhlfto6';
+if (savedCloud) CLOUDINARY_CLOUD_NAME = savedCloud;
+if (savedPreset) CLOUDINARY_UPLOAD_PRESET = savedPreset;
+</script>
+    </body>
+</html>
