@@ -21,7 +21,6 @@ export default defineSchema({
     badgeLabel: v.optional(v.string()),
     verified: v.boolean(),
     agentId: v.id("agents"),
-    img: v.string(),
     videoUrl: v.optional(v.string()),
     inspectionFee: v.string(),
     status: v.string(),

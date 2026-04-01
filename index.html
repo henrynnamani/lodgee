@@ -1,892 +1,2043 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Lodge — Campus Housing, Simplified</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet"/>
-<style>
-:root {
-  --bg: #0c0c0c;
-  --surface: #161616;
-  --surface2: #1e1e1e;
-  --border: #262626;
-  --orange: #ff6b2b;
-  --orange-dim: rgba(255,107,43,0.10);
-  --orange-glow: rgba(255,107,43,0.18);
-  --green: #25D366;
-  --text: #ede9e4;
-  --muted: #7a7a7a;
-  --muted2: #4a4a4a;
-  --radius: 12px;
-  --radius-sm: 7px;
-  --font-head: 'Syne', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-h1,h2,h3,h4,h5{font-family:var(--font-head)}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lodge — Campus Housing, Simplified</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap"
+    rel="stylesheet" />
+  <style>
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.52);
+      backdrop-filter: blur(2px);
+      transition: background 0.25s;
+      cursor: pointer;
+    }
 
-/* NAV */
-nav{
-  position:sticky;top:0;z-index:100;
-  background:rgba(12,12,12,0.94);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-  padding:0 24px;
-  display:flex;align-items:center;justify-content:space-between;
-  height:58px;
-}
-.nav-logo{font-family:var(--font-head);font-weight:800;font-size:1.35rem;color:var(--orange);letter-spacing:-0.5px}
-.nav-logo span{color:var(--text)}
-.nav-actions{display:flex;gap:8px;align-items:center}
-.btn-ghost{
-  background:none;border:1px solid var(--border);
-  color:var(--muted);padding:6px 14px;border-radius:7px;
-  font-size:0.8rem;font-family:var(--font-body);
-  cursor:pointer;transition:all 0.2s;position:relative;
-}
-.btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
-.coming-soon-badge{
-  position:absolute;top:-7px;right:-6px;
-  background:var(--orange);color:#fff;
-  font-size:0.58rem;font-weight:700;letter-spacing:0.3px;
-  padding:2px 5px;border-radius:4px;white-space:nowrap;
-}
-.btn-primary{
-  background:var(--orange);color:#fff;border:none;
-  padding:7px 16px;border-radius:7px;
-  font-size:0.8rem;font-weight:600;font-family:var(--font-body);
-  cursor:pointer;transition:all 0.2s;position:relative;
-}
-.btn-primary:hover{background:#e55a1f;transform:translateY(-1px)}
-.btn-upload{
-  background:var(--surface2);color:var(--muted);border:1px solid var(--border);
-  padding:7px 14px;border-radius:7px;
-  font-size:0.8rem;font-weight:500;font-family:var(--font-body);
-  cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;
-}
-.btn-upload:hover{border-color:var(--orange);color:var(--orange)}
+    .card:hover .play-overlay {
+      background: rgba(0, 0, 0, 0.38);
+    }
 
-/* HERO */
-.hero{
-  padding:56px 24px 36px;
-  text-align:center;position:relative;overflow:hidden;
-}
-.hero::before{
-  content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);
-  width:700px;height:500px;
-  background:radial-gradient(ellipse, rgba(255,107,43,0.07) 0%, transparent 65%);
-  pointer-events:none;
-}
-.hero-tag{
-  display:inline-block;
-  background:var(--orange-dim);color:var(--orange);
-  border:1px solid rgba(255,107,43,0.22);
-  padding:4px 13px;border-radius:20px;
-  font-size:0.75rem;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;
-  margin-bottom:16px;
-}
-.hero h1{
-  font-size:clamp(1.9rem,5.5vw,3.2rem);
-  font-weight:800;line-height:1.1;letter-spacing:-1px;
-  margin-bottom:10px;
-}
-.hero h1 em{color:var(--orange);font-style:normal}
-.hero-sub{color:var(--muted);font-size:0.88rem;margin-bottom:26px}
-.search-bar{
-  display:flex;gap:0;
-  max-width:500px;margin:0 auto 12px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:10px;overflow:hidden;transition:border-color 0.2s;
-}
-.search-bar:focus-within{border-color:var(--orange)}
-.search-bar input{
-  flex:1;background:none;border:none;outline:none;
-  padding:12px 16px;color:var(--text);
-  font-size:0.88rem;font-family:var(--font-body);
-}
-.search-bar input::placeholder{color:var(--muted2)}
-.search-bar button{
-  background:var(--orange);border:none;color:#fff;
-  padding:0 20px;font-weight:600;cursor:pointer;
-  font-family:var(--font-body);font-size:0.88rem;transition:background 0.2s;
-}
-.search-bar button:hover{background:#e55a1f}
-.hero-stats{display:flex;gap:20px;justify-content:center;margin-top:18px;flex-wrap:wrap}
-.hero-stat{color:var(--muted);font-size:0.78rem}
-.hero-stat strong{color:var(--text);font-weight:600}
+    .play-btn-ring {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.22s, transform 0.22s;
+    }
 
-/* MAIN LAYOUT */
-.main{display:flex;gap:0;max-width:1260px;margin:0 auto;padding:0 24px 60px}
+    .card:hover .play-btn-ring {
+      border-color: var(--orange);
+      transform: scale(1.07);
+    }
 
-/* SIDEBAR */
-.sidebar{
-  width:240px;flex-shrink:0;padding:20px 0;
-  position:sticky;top:74px;
-  height:calc(100vh - 74px);overflow-y:auto;
-}
-.sidebar::-webkit-scrollbar{width:3px}
-.sidebar::-webkit-scrollbar-track{background:transparent}
-.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.filter-section{margin-bottom:22px}
-.filter-label{
-  font-size:0.65rem;font-weight:700;letter-spacing:1.6px;
-  text-transform:uppercase;color:var(--muted2);
-  margin-bottom:10px;display:block;
-}
-.filter-chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{
-  padding:5px 11px;border-radius:20px;font-size:0.76rem;
-  border:1px solid var(--border);color:var(--muted);
-  cursor:pointer;transition:all 0.16s;background:var(--surface);
-  font-family:var(--font-body);
-}
-.chip:hover{border-color:rgba(255,107,43,0.5);color:var(--orange)}
-.chip.active{background:var(--orange-dim);border-color:var(--orange);color:var(--orange);font-weight:500}
-.price-range{padding:2px 0}
-.range-input{width:100%;accent-color:var(--orange);cursor:pointer}
-.range-labels{display:flex;justify-content:space-between;margin-top:6px;font-size:0.72rem;color:var(--muted2)}
-.range-value{color:var(--orange);font-size:0.78rem;margin-top:5px}
-.filter-divider{height:1px;background:var(--border);margin:2px 0 18px}
+    .play-btn-inner {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow 0.22s, transform 0.22s;
+    }
 
-/* CONTENT */
-.content{flex:1;padding:20px 0 0 24px}
+    .card:hover .play-btn-inner {
+      box-shadow: 0 0 22px rgba(255, 107, 43, 0.45);
+      transform: scale(1.05);
+    }
 
-/* TOOLBAR */
-.toolbar{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:18px;flex-wrap:wrap;gap:10px;
-}
-.toolbar-left{display:flex;align-items:center;gap:10px}
-.results-count{font-size:0.82rem;color:var(--muted)}
-.results-count strong{color:var(--text);font-weight:600}
-.sort-group{display:flex;gap:5px;align-items:center}
-.sort-label{font-size:0.75rem;color:var(--muted2);white-space:nowrap}
-.sort-btn{
-  padding:5px 12px;border-radius:7px;font-size:0.76rem;
-  border:1px solid var(--border);background:var(--surface);
-  color:var(--muted);cursor:pointer;transition:all 0.16s;
-  font-family:var(--font-body);display:flex;align-items:center;gap:3px;
-}
-.sort-btn:hover,.sort-btn.active{border-color:var(--orange);color:var(--orange);background:var(--orange-dim)}
+    .play-icon {
+      width: 0;
+      height: 0;
+      margin-left: 3px;
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      border-left: 16px solid #fff;
+    }
 
-/* GRID */
-.listings-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(275px,1fr));
-  gap:16px;
-}
+    .play-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.75);
+      transition: color 0.22s;
+    }
 
-/* CARD */
-.card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  overflow:hidden;cursor:pointer;
-  transition:transform 0.2s,border-color 0.2s,box-shadow 0.2s;
-  position:relative;
-}
-.card:hover{
-  transform:translateY(-3px);
-  border-color:rgba(255,107,43,0.3);
-  box-shadow:0 10px 32px rgba(0,0,0,0.45);
-}
-.card-media{position:relative;height:175px;overflow:hidden;background:var(--surface2)}
-.card-media img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
-.card:hover .card-media img{transform:scale(1.04)}
-.card-media-overlay{
-  position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(0,0,0,0.55) 0%,transparent 50%);
-}
-.card-wa-btn{
-  position:absolute;bottom:10px;right:10px;
-  background:var(--green);color:#fff;border:none;
-  width:36px;height:36px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:all 0.2s;z-index:5;
-  box-shadow:0 3px 12px rgba(37,211,102,0.4);
-  opacity:0;transform:scale(0.85);
-}
-.card:hover .card-wa-btn{opacity:1;transform:scale(1)}
-.card-wa-btn:hover{background:#1ab753;transform:scale(1.1)!important}
-.card-wa-btn svg{width:17px;height:17px}
+    .card:hover .play-label {
+      color: #fff;
+    }
 
-.video-badge{
-  position:absolute;top:9px;left:9px;
-  background:rgba(0,0,0,0.72);color:#fff;
-  font-size:0.68rem;padding:3px 8px;border-radius:20px;
-  display:flex;align-items:center;gap:3px;font-weight:500;
-  cursor:pointer;transition:background 0.2s;z-index:5;
-}
-.video-badge:hover{background:rgba(255,107,43,0.85)}
-.video-badge.has-video{color:#fff}
-.video-badge.no-video{opacity:0.5;cursor:not-allowed}
+    .video-duration {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.3px;
+    }
 
-.card-badges{
-  position:absolute;top:9px;right:9px;
-  display:flex;flex-direction:column;gap:4px;align-items:flex-end;
-}
-.badge{
-  font-size:0.65rem;font-weight:600;
-  padding:2px 8px;border-radius:20px;
-  display:flex;align-items:center;gap:3px;white-space:nowrap;
-}
-.badge-verified{background:rgba(34,197,94,0.18);color:#4ade80;border:1px solid rgba(34,197,94,0.25)}
-.badge-fire{background:rgba(255,107,43,0.18);color:var(--orange);border:1px solid rgba(255,107,43,0.25)}
-.badge-warn{background:rgba(245,158,11,0.18);color:#f59e0b;border:1px solid rgba(245,158,11,0.25)}
-.badge-fast{background:rgba(139,92,246,0.18);color:#a78bfa;border:1px solid rgba(139,92,246,0.25)}
+    :root {
+      --bg: #0c0c0c;
+      --surface: #161616;
+      --surface2: #1e1e1e;
+      --border: #262626;
+      --orange: #ff6b2b;
+      --orange-dim: rgba(255, 107, 43, 0.10);
+      --orange-glow: rgba(255, 107, 43, 0.18);
+      --green: #25D366;
+      --text: #ede9e4;
+      --muted: #7a7a7a;
+      --muted2: #4a4a4a;
+      --radius: 12px;
+      --radius-sm: 7px;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
 
-.card-body{padding:12px 14px 14px}
-.card-title{font-family:var(--font-head);font-weight:700;font-size:0.9rem;margin-bottom:5px;line-height:1.3;color:var(--text)}
-.card-meta{display:flex;gap:8px;margin-bottom:9px;flex-wrap:wrap}
-.card-meta-item{font-size:0.72rem;color:var(--muted);display:flex;align-items:center;gap:3px}
-.card-meta-item.ok{color:#4ade80}
-.card-meta-item.warn{color:#f87171}
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-.card-price-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:4px}
-.card-price{font-family:var(--font-head);font-size:1.2rem;font-weight:800;color:var(--orange)}
-.card-avail{font-size:0.7rem;text-align:right}
-.card-avail.now{color:#4ade80}
-.card-avail.soon{color:#f59e0b}
-.card-inspection{font-size:0.72rem;color:var(--muted);margin-bottom:8px}
-.card-inspection span{color:var(--muted2)}
+    html {
+      scroll-behavior: smooth
+    }
 
-.card-social{display:flex;gap:9px;margin-bottom:7px;flex-wrap:wrap}
-.card-social-item{font-size:0.7rem;color:var(--muted2);display:flex;align-items:center;gap:2px}
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden
+    }
 
-.card-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-top:9px;padding-top:9px;border-top:1px solid var(--border);
-}
-.agent-link{
-  font-size:0.72rem;color:var(--muted);background:none;border:none;cursor:pointer;
-  font-family:var(--font-body);padding:0;transition:color 0.18s;text-align:left;
-}
-.agent-link strong{color:var(--text);font-weight:500;text-decoration:underline;text-underline-offset:2px}
-.agent-link:hover strong{color:var(--orange)}
-.card-date{font-size:0.68rem;color:var(--muted2)}
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      font-family: var(--font-head)
+    }
 
-/* MODAL */
-.modal-backdrop{
-  position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);
-  display:flex;align-items:flex-start;justify-content:center;
-  padding:20px 16px;overflow-y:auto;
-  opacity:0;pointer-events:none;transition:opacity 0.22s;
-}
-.modal-backdrop.open{opacity:1;pointer-events:all}
-.modal{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:16px;width:100%;max-width:680px;
-  overflow:hidden;transform:translateY(20px);
-  transition:transform 0.28s;margin:auto;
-}
-.modal-backdrop.open .modal{transform:translateY(0)}
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(12, 12, 12, 0.94);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 58px;
+    }
 
-.modal-media{position:relative;height:260px;background:#000;overflow:hidden}
-.modal-media img{width:100%;height:100%;object-fit:cover}
-.modal-media video{width:100%;height:100%;object-fit:cover}
-.modal-media-overlay-btns{
-  position:absolute;top:12px;left:12px;
-  display:flex;gap:8px;align-items:center;
-}
-.media-tab{
-  background:rgba(0,0,0,0.7);color:#fff;border:1px solid rgba(255,255,255,0.15);
-  padding:5px 12px;border-radius:20px;font-size:0.72rem;font-weight:600;
-  cursor:pointer;transition:all 0.18s;font-family:var(--font-body);
-}
-.media-tab.active,.media-tab:hover{background:var(--orange);border-color:var(--orange)}
-.modal-media-badges{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
-.modal-close{
-  position:absolute;bottom:12px;left:12px;
-  background:rgba(0,0,0,0.65);border:none;color:#fff;
-  width:32px;height:32px;border-radius:50%;font-size:1rem;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:background 0.18s;
-}
-.modal-close:hover{background:rgba(255,107,43,0.8)}
-.modal-body{padding:22px}
-.modal-title{font-family:var(--font-head);font-size:1.3rem;font-weight:800;margin-bottom:5px}
-.modal-location{color:var(--muted);font-size:0.84rem;margin-bottom:16px;display:flex;align-items:center;gap:5px}
-.modal-price-hero{
-  background:var(--orange-dim);border:1px solid rgba(255,107,43,0.18);
-  border-radius:10px;padding:14px 16px;margin-bottom:18px;
-}
-.modal-price-big{font-family:var(--font-head);font-size:1.9rem;font-weight:800;color:var(--orange)}
-.modal-price-label{font-size:0.74rem;color:var(--muted);margin-top:1px}
-.breakdown-title{font-size:0.64rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);margin:12px 0 8px}
-.breakdown-rows{display:flex;flex-direction:column}
-.breakdown-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:7px 0;border-bottom:1px solid var(--border);font-size:0.82rem;
-}
-.breakdown-row:last-child{border-bottom:none}
-.breakdown-row .label{color:var(--muted)}
-.breakdown-row .value{font-weight:500;color:var(--text)}
-.breakdown-row.total .label{color:var(--text);font-weight:600}
-.breakdown-row.total .value{color:var(--orange);font-weight:700;font-size:0.95rem}
-.breakdown-note{
-  background:var(--surface2);border-radius:7px;
-  padding:9px 12px;margin-top:8px;font-size:0.73rem;color:var(--muted);line-height:1.5;
-}
-.modal-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
-.detail-item{background:var(--surface2);border-radius:8px;padding:10px 12px}
-.detail-item .dlabel{font-size:0.63rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted2);margin-bottom:4px}
-.detail-item .dvalue{font-size:0.84rem;font-weight:500;color:var(--text)}
-.detail-item .dvalue.ok{color:#4ade80}
-.detail-item .dvalue.no{color:#f87171}
-.detail-item .dvalue.ns{color:var(--muted);font-style:italic;font-weight:400}
-.inspection-box{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:9px;padding:12px 14px;margin:14px 0;
-  font-size:0.78rem;line-height:1.6;color:var(--muted);
-}
-.inspection-box strong{color:var(--text);display:block;margin-bottom:4px;font-size:0.82rem;font-weight:600}
-.inspection-tip{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:0.73rem;color:var(--muted2)}
-.agent-row{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 14px;background:var(--surface2);
-  border-radius:10px;margin-bottom:12px;cursor:pointer;
-  border:1px solid transparent;transition:border-color 0.18s;
-}
-.agent-row:hover{border-color:rgba(255,107,43,0.3)}
-.agent-avatar{
-  width:40px;height:40px;border-radius:50%;
-  background:var(--orange-dim);border:2px solid var(--orange);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-head);font-weight:800;color:var(--orange);font-size:0.95rem;flex-shrink:0;
-}
-.agent-info .agent-name{font-weight:600;font-size:0.86rem}
-.agent-info .agent-meta{font-size:0.72rem;color:var(--muted);margin-top:1px}
-.agent-info .agent-rating{color:var(--orange);font-size:0.73rem;margin-top:1px}
-.btn-whatsapp{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;padding:14px;
-  background:var(--green);color:#fff;
-  border:none;border-radius:10px;
-  font-size:0.95rem;font-weight:700;font-family:var(--font-head);
-  cursor:pointer;transition:all 0.2s;text-decoration:none;margin-bottom:8px;
-}
-.btn-whatsapp:hover{background:#1ab753;transform:translateY(-2px);box-shadow:0 8px 22px rgba(37,211,102,0.28)}
-.btn-secondary-cta{
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  width:100%;padding:11px;background:none;color:var(--muted);
-  border:1px solid var(--border);border-radius:10px;
-  font-size:0.83rem;font-weight:500;font-family:var(--font-body);
-  cursor:pointer;transition:all 0.2s;
-}
-.btn-secondary-cta:hover{border-color:var(--orange);color:var(--orange)}
-.social-proof-bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-.spb-item{font-size:0.72rem;color:var(--muted);display:flex;align-items:center;gap:3px}
-.spb-item span{color:var(--text);font-weight:500}
+    .nav-logo {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.35rem;
+      color: var(--orange);
+      letter-spacing: -0.5px
+    }
 
-/* AGENT VIEW */
-.agent-modal-header{
-  padding:20px 22px 0;display:flex;align-items:center;gap:14px;
-  border-bottom:1px solid var(--border);padding-bottom:18px;margin-bottom:18px;
-}
-.agent-modal-avatar{
-  width:52px;height:52px;border-radius:50%;
-  background:var(--orange-dim);border:2px solid var(--orange);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-head);font-weight:800;color:var(--orange);font-size:1.2rem;flex-shrink:0;
-}
-.agent-modal-name{font-family:var(--font-head);font-size:1.15rem;font-weight:700}
-.agent-modal-meta{font-size:0.78rem;color:var(--muted);margin-top:2px}
-.agent-modal-rating{color:var(--orange);font-size:0.78rem;margin-top:1px}
-.agent-listings-title{font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);padding:0 22px;margin-bottom:14px}
-.agent-listings-grid{padding:0 22px 22px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.agent-mini-card{
-  background:var(--surface2);border-radius:9px;overflow:hidden;
-  border:1px solid var(--border);cursor:pointer;transition:border-color 0.18s;
-}
-.agent-mini-card:hover{border-color:rgba(255,107,43,0.35)}
-.agent-mini-img{height:90px;overflow:hidden}
-.agent-mini-img img{width:100%;height:100%;object-fit:cover}
-.agent-mini-body{padding:8px 10px}
-.agent-mini-title{font-size:0.76rem;font-weight:600;margin-bottom:3px;color:var(--text);font-family:var(--font-head)}
-.agent-mini-price{font-size:0.8rem;font-weight:700;color:var(--orange)}
-.agent-back{
-  display:flex;align-items:center;gap:6px;
-  background:none;border:none;color:var(--muted);cursor:pointer;
-  font-size:0.8rem;font-family:var(--font-body);padding:14px 22px 0;
-  transition:color 0.18s;
-}
-.agent-back:hover{color:var(--orange)}
+    .nav-logo span {
+      color: var(--text)
+    }
 
-/* UPLOAD MODAL */
-.upload-modal-body{padding:24px}
-.upload-modal-body h3{font-family:var(--font-head);font-size:1.1rem;font-weight:700;margin-bottom:6px}
-.upload-modal-body p{font-size:0.8rem;color:var(--muted);margin-bottom:18px;line-height:1.5}
-.upload-zone{
-  border:2px dashed var(--border);border-radius:10px;
-  padding:32px;text-align:center;cursor:pointer;
-  transition:border-color 0.2s,background 0.2s;margin-bottom:16px;
-}
-.upload-zone:hover,.upload-zone.dragging{border-color:var(--orange);background:var(--orange-dim)}
-.upload-zone-icon{font-size:2rem;margin-bottom:8px}
-.upload-zone-text{font-size:0.82rem;color:var(--muted)}
-.upload-zone-hint{font-size:0.72rem;color:var(--muted2);margin-top:4px}
-.upload-progress{
-  background:var(--surface2);border-radius:8px;padding:12px 14px;
-  margin-bottom:12px;display:none;
-}
-.upload-progress-bar-wrap{background:var(--border);border-radius:4px;height:5px;margin-top:8px}
-.upload-progress-bar{background:var(--orange);height:5px;border-radius:4px;width:0%;transition:width 0.3s}
-.upload-progress-label{font-size:0.78rem;color:var(--muted);display:flex;justify-content:space-between}
-.upload-result{display:none;background:var(--surface2);border-radius:8px;padding:12px 14px;margin-bottom:12px}
-.upload-result-preview{width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px}
-.upload-result-url{font-size:0.72rem;color:var(--muted);word-break:break-all;font-family:monospace}
-.copy-url-btn{
-  background:var(--orange-dim);border:1px solid rgba(255,107,43,0.25);color:var(--orange);
-  padding:5px 12px;border-radius:6px;font-size:0.74rem;font-weight:600;
-  cursor:pointer;font-family:var(--font-body);margin-top:6px;
-}
-.copy-url-btn:hover{background:var(--orange-glow)}
+    .nav-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
 
-/* MOBILE FILTER */
-.mobile-filter-btn{
-  display:none;align-items:center;gap:6px;
-  padding:6px 14px;background:var(--surface);
-  border:1px solid var(--border);border-radius:7px;
-  color:var(--muted);font-size:0.78rem;cursor:pointer;font-family:var(--font-body);
-}
-.mobile-filter-btn:hover{border-color:var(--orange);color:var(--orange)}
-.mobile-overlay{
-  display:none;position:fixed;inset:0;z-index:150;
-  background:rgba(0,0,0,0.7);
-  opacity:0;pointer-events:none;transition:opacity 0.28s;
-}
-.mobile-overlay.open{opacity:1;pointer-events:all}
-.mobile-sidebar{
-  position:fixed;left:0;top:0;bottom:0;width:290px;z-index:160;
-  background:var(--surface);border-right:1px solid var(--border);
-  padding:22px;overflow-y:auto;
-  transform:translateX(-100%);transition:transform 0.28s;
-}
-.mobile-sidebar.open{transform:translateX(0)}
-.mobile-sidebar-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer}
+    .btn-ghost {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 0.8rem;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
 
-/* EMPTY / LOADING */
-.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
-.empty-state p{font-size:0.9rem;margin-top:8px}
-.skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:16px}
-.skeleton-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;height:320px;animation:shimmer 1.5s infinite}
-@keyframes shimmer{0%,100%{opacity:0.6}50%{opacity:1}}
+    .btn-ghost:hover {
+      border-color: var(--orange);
+      color: var(--orange)
+    }
 
-/* FOOTER */
-footer{
-  border-top:1px solid var(--border);
-  padding:26px 24px;text-align:center;
-  color:var(--muted);font-size:0.78rem;line-height:1.8;
-}
-footer strong{color:var(--orange)}
+    .coming-soon-badge {
+      position: absolute;
+      top: -7px;
+      right: -6px;
+      background: var(--orange);
+      color: #fff;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
 
-/* Toast */
-.toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:var(--surface2);border:1px solid var(--border);
-  padding:10px 20px;border-radius:8px;font-size:0.82rem;
-  color:var(--text);opacity:0;transition:all 0.3s;z-index:999;white-space:nowrap;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .btn-primary {
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 7px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
 
-/* Convex status dot */
-.convex-status{
-  display:flex;align-items:center;gap:5px;
-  font-size:0.68rem;color:var(--muted2);padding:0 4px;
-}
-.convex-dot{width:6px;height:6px;border-radius:50%;background:var(--muted2)}
-.convex-dot.live{background:#4ade80;box-shadow:0 0 5px rgba(74,222,128,0.5);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+    .btn-primary:hover {
+      background: #e55a1f;
+      transform: translateY(-1px)
+    }
 
-@media(max-width:900px){
-  .sidebar{display:none}
-  .content{padding-left:0}
-  .mobile-filter-btn{display:flex}
-  .mobile-overlay{display:block}
-}
-@media(max-width:600px){
-  .hero{padding:36px 16px 26px}
-  .main{padding:0 16px 40px}
-  .modal-details-grid{grid-template-columns:1fr}
-  .listings-grid{grid-template-columns:1fr}
-  .toolbar{flex-direction:column;align-items:flex-start}
-  .agent-listings-grid{grid-template-columns:1fr}
-}
-</style>
+    .btn-upload {
+      background: var(--surface2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-upload:hover {
+      border-color: var(--orange);
+      color: var(--orange)
+    }
+
+    /* HERO */
+    .hero {
+      padding: 56px 24px 36px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(255, 107, 43, 0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      background: var(--orange-dim);
+      color: var(--orange);
+      border: 1px solid rgba(255, 107, 43, 0.22);
+      padding: 4px 13px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.9rem, 5.5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+    }
+
+    .hero h1 em {
+      color: var(--orange);
+      font-style: normal
+    }
+
+    .hero-sub {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 26px
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 0;
+      max-width: 500px;
+      margin: 0 auto 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar:focus-within {
+      border-color: var(--orange)
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      padding: 12px 16px;
+      color: var(--text);
+      font-size: 0.88rem;
+      font-family: var(--font-body);
+    }
+
+    .search-bar input::placeholder {
+      color: var(--muted2)
+    }
+
+    .search-bar button {
+      background: var(--orange);
+      border: none;
+      color: #fff;
+      padding: 0 20px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      transition: background 0.2s;
+    }
+
+    .search-bar button:hover {
+      background: #e55a1f
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 18px;
+      flex-wrap: wrap
+    }
+
+    .hero-stat {
+      color: var(--muted);
+      font-size: 0.78rem
+    }
+
+    .hero-stat strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    /* MAIN LAYOUT */
+    .main {
+      display: flex;
+      gap: 0;
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 0 24px 60px
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      padding: 20px 0;
+      position: sticky;
+      top: 74px;
+      height: calc(100vh - 74px);
+      overflow-y: auto;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 3px
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px
+    }
+
+    .filter-section {
+      margin-bottom: 22px
+    }
+
+    .filter-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .chip {
+      padding: 5px 11px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.16s;
+      background: var(--surface);
+      font-family: var(--font-body);
+    }
+
+    .chip:hover {
+      border-color: rgba(255, 107, 43, 0.5);
+      color: var(--orange)
+    }
+
+    .chip.active {
+      background: var(--orange-dim);
+      border-color: var(--orange);
+      color: var(--orange);
+      font-weight: 500
+    }
+
+    .price-range {
+      padding: 2px 0
+    }
+
+    .range-input {
+      width: 100%;
+      accent-color: var(--orange);
+      cursor: pointer
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 0.72rem;
+      color: var(--muted2)
+    }
+
+    .range-value {
+      color: var(--orange);
+      font-size: 0.78rem;
+      margin-top: 5px
+    }
+
+    .filter-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2px 0 18px
+    }
+
+    /* CONTENT */
+    .content {
+      flex: 1;
+      padding: 20px 0 0 24px
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .results-count {
+      font-size: 0.82rem;
+      color: var(--muted)
+    }
+
+    .results-count strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    .sort-group {
+      display: flex;
+      gap: 5px;
+      align-items: center
+    }
+
+    .sort-label {
+      font-size: 0.75rem;
+      color: var(--muted2);
+      white-space: nowrap
+    }
+
+    .sort-btn {
+      padding: 5px 12px;
+      border-radius: 7px;
+      font-size: 0.76rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.16s;
+      font-family: var(--font-body);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .sort-btn:hover,
+    .sort-btn.active {
+      border-color: var(--orange);
+      color: var(--orange);
+      background: var(--orange-dim)
+    }
+
+    /* GRID */
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+      gap: 16px;
+    }
+
+    /* CARD */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 107, 43, 0.3);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .card-media {
+      position: relative;
+      height: 175px;
+      overflow: hidden;
+      background: var(--surface2)
+    }
+
+    .card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s
+    }
+
+    .card:hover .card-media img {
+      transform: scale(1.04)
+    }
+
+    .card-media-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 50%);
+    }
+
+    .card-wa-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 5;
+      box-shadow: 0 3px 12px rgba(37, 211, 102, 0.4);
+      opacity: 0;
+      transform: scale(0.85);
+    }
+
+    .card:hover .card-wa-btn {
+      opacity: 1;
+      transform: scale(1)
+    }
+
+    .card-wa-btn:hover {
+      background: #1ab753;
+      transform: scale(1.1) !important
+    }
+
+    .card-wa-btn svg {
+      width: 17px;
+      height: 17px
+    }
+
+    .video-badge {
+      position: absolute;
+      top: 9px;
+      left: 9px;
+      background: rgba(0, 0, 0, 0.72);
+      color: #fff;
+      font-size: 0.68rem;
+      padding: 3px 8px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      z-index: 5;
+    }
+
+    .video-badge:hover {
+      background: rgba(255, 107, 43, 0.85)
+    }
+
+    .video-badge.has-video {
+      color: #fff
+    }
+
+    .video-badge.no-video {
+      opacity: 0.5;
+      cursor: not-allowed
+    }
+
+    .card-badges {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+    }
+
+    .badge-verified {
+      background: rgba(34, 197, 94, 0.18);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.25)
+    }
+
+    .badge-fire {
+      background: rgba(255, 107, 43, 0.18);
+      color: var(--orange);
+      border: 1px solid rgba(255, 107, 43, 0.25)
+    }
+
+    .badge-warn {
+      background: rgba(245, 158, 11, 0.18);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.25)
+    }
+
+    .badge-fast {
+      background: rgba(139, 92, 246, 0.18);
+      color: #a78bfa;
+      border: 1px solid rgba(139, 92, 246, 0.25)
+    }
+
+    .card-body {
+      padding: 12px 14px 14px
+    }
+
+    .card-title {
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+      line-height: 1.3;
+      color: var(--text)
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 9px;
+      flex-wrap: wrap
+    }
+
+    .card-meta-item {
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 3px
+    }
+
+    .card-meta-item.ok {
+      color: #4ade80
+    }
+
+    .card-meta-item.warn {
+      color: #f87171
+    }
+
+    .card-price-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 4px
+    }
+
+    .card-price {
+      font-family: var(--font-head);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--orange)
+    }
+
+    .card-avail {
+      font-size: 0.7rem;
+      text-align: right
+    }
+
+    .card-avail.now {
+      color: #4ade80
+    }
+
+    .card-avail.soon {
+      color: #f59e0b
+    }
+
+    .card-inspection {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 8px
+    }
+
+    .card-inspection span {
+      color: var(--muted2)
+    }
+
+    .card-social {
+      display: flex;
+      gap: 9px;
+      margin-bottom: 7px;
+      flex-wrap: wrap
+    }
+
+    .card-social-item {
+      font-size: 0.7rem;
+      color: var(--muted2);
+      display: flex;
+      align-items: center;
+      gap: 2px
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 9px;
+      padding-top: 9px;
+      border-top: 1px solid var(--border);
+    }
+
+    .agent-link {
+      font-size: 0.72rem;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      padding: 0;
+      transition: color 0.18s;
+      text-align: left;
+    }
+
+    .agent-link strong {
+      color: var(--text);
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 2px
+    }
+
+    .agent-link:hover strong {
+      color: var(--orange)
+    }
+
+    .card-date {
+      font-size: 0.68rem;
+      color: var(--muted2)
+    }
+
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px 16px;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: all
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 680px;
+      overflow: hidden;
+      transform: translateY(20px);
+      transition: transform 0.28s;
+      margin: auto;
+    }
+
+    .modal-backdrop.open .modal {
+      transform: translateY(0)
+    }
+
+    .modal-media {
+      position: relative;
+      height: 260px;
+      background: #000;
+      overflow: hidden
+    }
+
+    .modal-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .modal-media video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .modal-media-overlay-btns {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .media-tab {
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      font-family: var(--font-body);
+    }
+
+    .media-tab.active,
+    .media-tab:hover {
+      background: var(--orange);
+      border-color: var(--orange)
+    }
+
+    .modal-media-badges {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: flex-end
+    }
+
+    .modal-close {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.65);
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 107, 43, 0.8)
+    }
+
+    .modal-body {
+      padding: 22px
+    }
+
+    .modal-title {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 5px
+    }
+
+    .modal-location {
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .modal-price-hero {
+      background: var(--orange-dim);
+      border: 1px solid rgba(255, 107, 43, 0.18);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+
+    .modal-price-big {
+      font-family: var(--font-head);
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--orange)
+    }
+
+    .modal-price-label {
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-top: 1px
+    }
+
+    .breakdown-title {
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin: 12px 0 8px
+    }
+
+    .breakdown-rows {
+      display: flex;
+      flex-direction: column
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+
+    .breakdown-row:last-child {
+      border-bottom: none
+    }
+
+    .breakdown-row .label {
+      color: var(--muted)
+    }
+
+    .breakdown-row .value {
+      font-weight: 500;
+      color: var(--text)
+    }
+
+    .breakdown-row.total .label {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    .breakdown-row.total .value {
+      color: var(--orange);
+      font-weight: 700;
+      font-size: 0.95rem
+    }
+
+    .breakdown-note {
+      background: var(--surface2);
+      border-radius: 7px;
+      padding: 9px 12px;
+      margin-top: 8px;
+      font-size: 0.73rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .modal-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 18px 0
+    }
+
+    .detail-item {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 10px 12px
+    }
+
+    .detail-item .dlabel {
+      font-size: 0.63rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted2);
+      margin-bottom: 4px
+    }
+
+    .detail-item .dvalue {
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--text)
+    }
+
+    .detail-item .dvalue.ok {
+      color: #4ade80
+    }
+
+    .detail-item .dvalue.no {
+      color: #f87171
+    }
+
+    .detail-item .dvalue.ns {
+      color: var(--muted);
+      font-style: italic;
+      font-weight: 400
+    }
+
+    .inspection-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 12px 14px;
+      margin: 14px 0;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .inspection-box strong {
+      color: var(--text);
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.82rem;
+      font-weight: 600
+    }
+
+    .inspection-tip {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      font-size: 0.73rem;
+      color: var(--muted2)
+    }
+
+    .agent-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--surface2);
+      border-radius: 10px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: border-color 0.18s;
+    }
+
+    .agent-row:hover {
+      border-color: rgba(255, 107, 43, 0.3)
+    }
+
+    .agent-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--orange-dim);
+      border: 2px solid var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-head);
+      font-weight: 800;
+      color: var(--orange);
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .agent-info .agent-name {
+      font-weight: 600;
+      font-size: 0.86rem
+    }
+
+    .agent-info .agent-meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 1px
+    }
+
+    .agent-info .agent-rating {
+      color: var(--orange);
+      font-size: 0.73rem;
+      margin-top: 1px
+    }
+
+    .btn-whatsapp {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: var(--font-head);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      margin-bottom: 8px;
+    }
+
+    .btn-whatsapp:hover {
+      background: #1ab753;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(37, 211, 102, 0.28)
+    }
+
+    .btn-secondary-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      padding: 11px;
+      background: none;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.83rem;
+      font-weight: 500;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary-cta:hover {
+      border-color: var(--orange);
+      color: var(--orange)
+    }
+
+    .social-proof-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    .spb-item {
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 3px
+    }
+
+    .spb-item span {
+      color: var(--text);
+      font-weight: 500
+    }
+
+    /* AGENT VIEW */
+    .agent-modal-header {
+      padding: 20px 22px 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+    }
+
+    .agent-modal-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--orange-dim);
+      border: 2px solid var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-head);
+      font-weight: 800;
+      color: var(--orange);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .agent-modal-name {
+      font-family: var(--font-head);
+      font-size: 1.15rem;
+      font-weight: 700
+    }
+
+    .agent-modal-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    .agent-modal-rating {
+      color: var(--orange);
+      font-size: 0.78rem;
+      margin-top: 1px
+    }
+
+    .agent-listings-title {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted2);
+      padding: 0 22px;
+      margin-bottom: 14px
+    }
+
+    .agent-listings-grid {
+      padding: 0 22px 22px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    .agent-mini-card {
+      background: var(--surface2);
+      border-radius: 9px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.18s;
+    }
+
+    .agent-mini-card:hover {
+      border-color: rgba(255, 107, 43, 0.35)
+    }
+
+    .agent-mini-img {
+      height: 90px;
+      overflow: hidden
+    }
+
+    .agent-mini-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .agent-mini-body {
+      padding: 8px 10px
+    }
+
+    .agent-mini-title {
+      font-size: 0.76rem;
+      font-weight: 600;
+      margin-bottom: 3px;
+      color: var(--text);
+      font-family: var(--font-head)
+    }
+
+    .agent-mini-price {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--orange)
+    }
+
+    .agent-back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-family: var(--font-body);
+      padding: 14px 22px 0;
+      transition: color 0.18s;
+    }
+
+    .agent-back:hover {
+      color: var(--orange)
+    }
+
+    /* UPLOAD MODAL */
+    .upload-modal-body {
+      padding: 24px
+    }
+
+    .upload-modal-body h3 {
+      font-family: var(--font-head);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .upload-modal-body p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.5
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 16px;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragging {
+      border-color: var(--orange);
+      background: var(--orange-dim)
+    }
+
+    .upload-zone-icon {
+      font-size: 2rem;
+      margin-bottom: 8px
+    }
+
+    .upload-zone-text {
+      font-size: 0.82rem;
+      color: var(--muted)
+    }
+
+    .upload-zone-hint {
+      font-size: 0.72rem;
+      color: var(--muted2);
+      margin-top: 4px
+    }
+
+    .upload-progress {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .upload-progress-bar-wrap {
+      background: var(--border);
+      border-radius: 4px;
+      height: 5px;
+      margin-top: 8px
+    }
+
+    .upload-progress-bar {
+      background: var(--orange);
+      height: 5px;
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s
+    }
+
+    .upload-progress-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between
+    }
+
+    .upload-result {
+      display: none;
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px
+    }
+
+    .upload-result-preview {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 8px
+    }
+
+    .upload-result-url {
+      font-size: 0.72rem;
+      color: var(--muted);
+      word-break: break-all;
+      font-family: monospace
+    }
+
+    .copy-url-btn {
+      background: var(--orange-dim);
+      border: 1px solid rgba(255, 107, 43, 0.25);
+      color: var(--orange);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+      margin-top: 6px;
+    }
+
+    .copy-url-btn:hover {
+      background: var(--orange-glow)
+    }
+
+    /* MOBILE FILTER */
+    .mobile-filter-btn {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-family: var(--font-body);
+    }
+
+    .mobile-filter-btn:hover {
+      border-color: var(--orange);
+      color: var(--orange)
+    }
+
+    .mobile-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+      background: rgba(0, 0, 0, 0.7);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s;
+    }
+
+    .mobile-overlay.open {
+      opacity: 1;
+      pointer-events: all
+    }
+
+    .mobile-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 290px;
+      z-index: 160;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 22px;
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform 0.28s;
+    }
+
+    .mobile-sidebar.open {
+      transform: translateX(0)
+    }
+
+    .mobile-sidebar-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.1rem;
+      cursor: pointer
+    }
+
+    /* EMPTY / LOADING */
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--muted)
+    }
+
+    .empty-state p {
+      font-size: 0.9rem;
+      margin-top: 8px
+    }
+
+    .skeleton-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+      gap: 16px
+    }
+
+    .skeleton-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      height: 320px;
+      animation: shimmer 1.5s infinite
+    }
+
+    @keyframes shimmer {
+
+      0%,
+      100% {
+        opacity: 0.6
+      }
+
+      50% {
+        opacity: 1
+      }
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 26px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.8;
+    }
+
+    footer strong {
+      color: var(--orange)
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: var(--text);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 999;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    /* Convex status dot */
+    .convex-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.68rem;
+      color: var(--muted2);
+      padding: 0 4px;
+    }
+
+    .convex-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--muted2)
+    }
+
+    .convex-dot.live {
+      background: #4ade80;
+      box-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
+      animation: pulse 2s infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.5
+      }
+    }
+
+    @media(max-width:900px) {
+      .sidebar {
+        display: none
+      }
+
+      .content {
+        padding-left: 0
+      }
+
+      .mobile-filter-btn {
+        display: flex
+      }
+
+      .mobile-overlay {
+        display: block
+      }
+    }
+
+    @media(max-width:600px) {
+      .hero {
+        padding: 36px 16px 26px
+      }
+
+      .main {
+        padding: 0 16px 40px
+      }
+
+      .modal-details-grid {
+        grid-template-columns: 1fr
+      }
+
+      .listings-grid {
+        grid-template-columns: 1fr
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: flex-start
+      }
+
+      .agent-listings-grid {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">Lodge<span>.</span></div>
-  <div class="nav-actions">
-    <div class="convex-status" id="convexStatus">
-      <div class="convex-dot" id="convexDot"></div>
-      <span id="convexLabel">connecting…</span>
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Lodge<span>.</span></div>
+    <div class="nav-actions">
+      <div class="convex-status" id="convexStatus">
+        <div class="convex-dot" id="convexDot"></div>
+        <span id="convexLabel">connecting…</span>
+      </div>
+      <button class="btn-upload" onclick="openUploadModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 16 12 12 8 16" />
+          <line x1="12" y1="12" x2="12" y2="21" />
+          <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+        </svg>
+        Upload Media
+      </button>
+      <button class="btn-ghost" onclick="showComingSoon('Agent signup')">
+        List a Room
+        <span class="coming-soon-badge">Soon</span>
+      </button>
+      <button class="btn-primary" onclick="showComingSoon('Student accounts')">
+        Find Housing
+        <span class="coming-soon-badge">Soon</span>
+      </button>
     </div>
-    <button class="btn-upload" onclick="openUploadModal()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-      Upload Media
-    </button>
-    <button class="btn-ghost" onclick="showComingSoon('Agent signup')">
-      List a Room
-      <span class="coming-soon-badge">Soon</span>
-    </button>
-    <button class="btn-primary" onclick="showComingSoon('Student accounts')">
-      Find Housing
-      <span class="coming-soon-badge">Soon</span>
-    </button>
-  </div>
-</nav>
+  </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-tag">🏠 Campus Housing, Simplified</div>
-  <h1>Find your room.<br/><em>No middlemen. No surprises.</em></h1>
-  <p class="hero-sub">Now available in Nsukka &amp; Enugu</p>
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search by area, e.g. Maryland, Odim, Hilltop…" oninput="filterListings()"/>
-    <button onclick="filterListings()">Search</button>
-  </div>
-  <div class="hero-stats">
-    <div class="hero-stat" id="statRooms"><strong>—</strong> verified rooms</div>
-    <div class="hero-stat"><strong>—</strong> agents active</div>
-    <div class="hero-stat"><strong>₦80k–₦600k</strong> price range</div>
-    <div class="hero-stat" id="statToday"><strong>—</strong> rooms added today</div>
-  </div>
-</section>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">🏠 Campus Housing, Simplified</div>
+    <h1>Find your room.<br /><em>No middlemen. No surprises.</em></h1>
+    <p class="hero-sub">Now available in Nsukka &amp; Enugu</p>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by area, e.g. Maryland, Odim, Hilltop…"
+        oninput="filterListings()" />
+      <button onclick="filterListings()">Search</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat" id="statRooms"><strong>—</strong> verified
+        rooms</div>
+      <div class="hero-stat"><strong>—</strong> agents active</div>
+      <div class="hero-stat"><strong>₦80k–₦600k</strong> price range</div>
+      <div class="hero-stat" id="statToday"><strong>—</strong> rooms added
+        today</div>
+    </div>
+  </section>
 
-<!-- MAIN -->
-<div class="main">
-  <!-- SIDEBAR desktop -->
-  <aside class="sidebar">
-    <div class="filter-section">
-      <span class="filter-label">Room Type</span>
-      <div class="filter-chips" id="typeChips">
-        <div class="chip active" data-type="All" onclick="selectChip(this,'type')">All</div>
-        <div class="chip" data-type="Single" onclick="selectChip(this,'type')">Single</div>
-        <div class="chip" data-type="Self-Contain" onclick="selectChip(this,'type')">Self-Contain</div>
-        <div class="chip" data-type="Shared" onclick="selectChip(this,'type')">Shared</div>
-        <div class="chip" data-type="Flat" onclick="selectChip(this,'type')">Flat</div>
-      </div>
-    </div>
-    <div class="filter-divider"></div>
-    <div class="filter-section">
-      <span class="filter-label">Max Price</span>
-      <div class="price-range">
-        <input type="range" class="range-input" min="80000" max="600000" step="10000" value="600000" id="priceRange" oninput="updatePrice(this)"/>
-        <div class="range-labels"><span>₦80k</span><span>₦600k</span></div>
-        <div class="range-value" id="priceRangeVal">Up to ₦600,000</div>
-      </div>
-    </div>
-    <div class="filter-divider"></div>
-    <div class="filter-section">
-      <span class="filter-label">Distance to School</span>
-      <div class="filter-chips" id="distChips">
-        <div class="chip active" data-dist="All" onclick="selectChip(this,'dist')">Any</div>
-        <div class="chip" data-dist="5" onclick="selectChip(this,'dist')">≤5 min</div>
-        <div class="chip" data-dist="10" onclick="selectChip(this,'dist')">≤10 min</div>
-        <div class="chip" data-dist="20" onclick="selectChip(this,'dist')">≤20 min</div>
-      </div>
-    </div>
-    <div class="filter-divider"></div>
-    <div class="filter-section">
-      <span class="filter-label">Amenities</span>
-      <div class="filter-chips">
-        <div class="chip" id="filterWater" onclick="toggleAmenity('water',this)">💧 Water</div>
-        <div class="chip" id="filterElec" onclick="toggleAmenity('elec',this)">⚡ Electricity</div>
-      </div>
-    </div>
-    <div class="filter-divider"></div>
-    <div class="filter-section">
-      <span class="filter-label">Availability</span>
-      <div class="filter-chips" id="availChips">
-        <div class="chip active" data-avail="All" onclick="selectChip(this,'avail')">All</div>
-        <div class="chip" data-avail="Immediate" onclick="selectChip(this,'avail')">Immediate</div>
-        <div class="chip" data-avail="Next Month" onclick="selectChip(this,'avail')">Next Month</div>
-      </div>
-    </div>
-    <div class="filter-divider"></div>
-    <div class="filter-section">
-      <span class="filter-label">Agent</span>
-      <div class="filter-chips" id="agentChips">
-        <div class="chip active" data-agent="All" onclick="selectChip(this,'agent')">All Agents</div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- CONTENT -->
-  <div class="content">
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <button class="mobile-filter-btn" onclick="openMobileSidebar()">⚙ Filters</button>
-        <div class="results-count" id="resultsCount"><strong>—</strong> rooms found</div>
-      </div>
-      <div class="sort-group">
-        <span class="sort-label">Sort:</span>
-        <button class="sort-btn active" id="sort-price" onclick="setSort('price',this)">Cheapest <span id="arrow-price">↑</span></button>
-        <button class="sort-btn" id="sort-dist" onclick="setSort('dist',this)">Closest</button>
-        <button class="sort-btn" id="sort-new" onclick="setSort('new',this)">Newest</button>
-      </div>
-    </div>
-    <!-- Skeleton loader shown while Convex data loads -->
-    <div class="skeleton-grid" id="skeletonGrid">
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-    </div>
-    <div class="listings-grid" id="listingsGrid" style="display:none"></div>
-    <div class="empty-state" id="emptyState" style="display:none">
-      <div style="font-size:2.2rem">🔍</div>
-      <p>No rooms match your filters. Try adjusting the search.</p>
-    </div>
-  </div>
-</div>
-
-<!-- LISTING MODAL -->
-<div class="modal-backdrop" id="modalBackdrop" onclick="handleBackdropClick(event)">
-  <div class="modal" id="modal">
-    <div class="modal-media" id="modalMedia">
-      <img id="modalImg" src="" alt="Room"/>
-      <div class="modal-media-overlay-btns" id="modalMediaTabs"></div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-      <div class="modal-media-badges" id="modalBadges"></div>
-    </div>
-    <div class="modal-body" id="modalBody"></div>
-  </div>
-</div>
-
-<!-- AGENT MODAL -->
-<div class="modal-backdrop" id="agentModalBackdrop" onclick="handleAgentBackdropClick(event)">
-  <div class="modal" id="agentModal">
-    <div id="agentModalContent"></div>
-  </div>
-</div>
-
-<!-- UPLOAD MODAL -->
-<div class="modal-backdrop" id="uploadModalBackdrop" onclick="handleUploadBackdropClick(event)">
-  <div class="modal" id="uploadModal">
-    <div class="upload-modal-body">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
-        <div>
-          <h3>Upload Listing Media</h3>
-          <p>Upload photos or videos to Cloudinary for use in listings.<br/>Images: JPG/PNG/WEBP · Videos: MP4/MOV (max 100MB)</p>
-        </div>
-        <button onclick="closeUploadModal()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:0">✕</button>
-      </div>
-      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="this.classList.remove('dragging')">
-        <div class="upload-zone-icon">☁️</div>
-        <div class="upload-zone-text">Click to select or drag & drop a file</div>
-        <div class="upload-zone-hint">Cloudinary · Automatic optimization & CDN delivery</div>
-      </div>
-      <input type="file" id="fileInput" accept="image/*,video/*" style="display:none" onchange="handleFileSelect(event)"/>
-      <div class="upload-progress" id="uploadProgress">
-        <div class="upload-progress-label">
-          <span id="uploadFileName">Uploading…</span>
-          <span id="uploadPercent">0%</span>
-        </div>
-        <div class="upload-progress-bar-wrap">
-          <div class="upload-progress-bar" id="uploadProgressBar"></div>
+  <!-- MAIN -->
+  <div class="main">
+    <!-- SIDEBAR desktop -->
+    <aside class="sidebar">
+      <div class="filter-section">
+        <span class="filter-label">Room Type</span>
+        <div class="filter-chips" id="typeChips">
+          <div class="chip active" data-type="All" onclick="selectChip(this,'type')">All</div>
+          <div class="chip" data-type="Single" onclick="selectChip(this,'type')">Single</div>
+          <div class="chip" data-type="Self-Contain" onclick="selectChip(this,'type')">Self-Contain</div>
+          <div class="chip" data-type="Shared" onclick="selectChip(this,'type')">Shared</div>
+          <div class="chip" data-type="Flat" onclick="selectChip(this,'type')">Flat</div>
         </div>
       </div>
-      <div class="upload-result" id="uploadResult">
-        <img id="uploadResultPreview" class="upload-result-preview" src="" alt="" style="display:none"/>
-        <video id="uploadResultVideo" class="upload-result-preview" controls style="display:none;width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px"></video>
-        <div class="upload-result-url" id="uploadResultUrl"></div>
-        <button class="copy-url-btn" onclick="copyUploadUrl()">Copy URL</button>
+      <div class="filter-divider"></div>
+      <div class="filter-section">
+        <span class="filter-label">Max Price</span>
+        <div class="price-range">
+          <input type="range" class="range-input" min="80000" max="600000" step="10000" value="600000" id="priceRange"
+            oninput="updatePrice(this)" />
+          <div class="range-labels"><span>₦80k</span><span>₦600k</span></div>
+          <div class="range-value" id="priceRangeVal">Up to ₦600,000</div>
+        </div>
       </div>
-      <div style="background:var(--surface2);border-radius:8px;padding:12px 14px;font-size:0.74rem;color:var(--muted);line-height:1.6">
-        <strong style="color:var(--text);display:block;margin-bottom:4px">🔧 Cloudinary Setup</strong>
-        Set your <code style="color:var(--orange)">CLOUDINARY_CLOUD_NAME</code> and <code style="color:var(--orange)">CLOUDINARY_UPLOAD_PRESET</code> in the script config.
+      <div class="filter-divider"></div>
+      <div class="filter-section">
+        <span class="filter-label">Distance to School</span>
+        <div class="filter-chips" id="distChips">
+          <div class="chip active" data-dist="All" onclick="selectChip(this,'dist')">Any</div>
+          <div class="chip" data-dist="5" onclick="selectChip(this,'dist')">≤5
+            min</div>
+          <div class="chip" data-dist="10" onclick="selectChip(this,'dist')">≤10 min</div>
+          <div class="chip" data-dist="20" onclick="selectChip(this,'dist')">≤20 min</div>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-section">
+        <span class="filter-label">Amenities</span>
+        <div class="filter-chips">
+          <div class="chip" id="filterWater" onclick="toggleAmenity('water',this)">💧 Water</div>
+          <div class="chip" id="filterElec" onclick="toggleAmenity('elec',this)">⚡ Electricity</div>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-section">
+        <span class="filter-label">Availability</span>
+        <div class="filter-chips" id="availChips">
+          <div class="chip active" data-avail="All" onclick="selectChip(this,'avail')">All</div>
+          <div class="chip" data-avail="Immediate" onclick="selectChip(this,'avail')">Immediate</div>
+          <div class="chip" data-avail="Next Month" onclick="selectChip(this,'avail')">Next Month</div>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-section">
+        <span class="filter-label">Agent</span>
+        <div class="filter-chips" id="agentChips">
+          <div class="chip active" data-agent="All" onclick="selectChip(this,'agent')">All Agents</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="mobile-filter-btn" onclick="openMobileSidebar()">⚙
+            Filters</button>
+          <div class="results-count" id="resultsCount"><strong>—</strong>
+            rooms found</div>
+        </div>
+        <div class="sort-group">
+          <span class="sort-label">Sort:</span>
+          <button class="sort-btn active" id="sort-price" onclick="setSort('price',this)">Cheapest <span
+              id="arrow-price">↑</span></button>
+          <button class="sort-btn" id="sort-dist" onclick="setSort('dist',this)">Closest</button>
+          <button class="sort-btn" id="sort-new" onclick="setSort('new',this)">Newest</button>
+        </div>
+      </div>
+      <!-- Skeleton loader shown while Convex data loads -->
+      <div class="skeleton-grid" id="skeletonGrid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+      <div class="listings-grid" id="listingsGrid" style="display:none"></div>
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div style="font-size:2.2rem">🔍</div>
+        <p>No rooms match your filters. Try adjusting the search.</p>
       </div>
     </div>
   </div>
-</div>
 
-<!-- MOBILE SIDEBAR -->
-<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
-<div class="mobile-sidebar" id="mobileSidebar">
-  <button class="mobile-sidebar-close" onclick="closeMobileSidebar()">✕</button>
-  <div style="margin-top:12px">
-    <div class="filter-section">
-      <span class="filter-label">Room Type</span>
-      <div class="filter-chips" id="typeChipsMobile">
-        <div class="chip active" data-type="All" onclick="selectChip(this,'type')">All</div>
-        <div class="chip" data-type="Single" onclick="selectChip(this,'type')">Single</div>
-        <div class="chip" data-type="Self-Contain" onclick="selectChip(this,'type')">Self-Contain</div>
-        <div class="chip" data-type="Shared" onclick="selectChip(this,'type')">Shared</div>
-        <div class="chip" data-type="Flat" onclick="selectChip(this,'type')">Flat</div>
+  <!-- LISTING MODAL -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="handleBackdropClick(event)">
+    <div class="modal" id="modal">
+      <div class="modal-media" id="modalMedia">
+        <img id="modalImg" src alt="Room" />
+        <div class="modal-media-overlay-btns" id="modalMediaTabs"></div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-media-badges" id="modalBadges"></div>
       </div>
-    </div>
-    <div class="filter-divider"></div>
-    <div class="filter-section">
-      <span class="filter-label">Max Price</span>
-      <div class="price-range">
-        <input type="range" class="range-input" min="80000" max="600000" step="10000" value="600000" oninput="updatePrice(this)"/>
-        <div class="range-labels"><span>₦80k</span><span>₦600k</span></div>
-        <div class="range-value">Up to ₦600,000</div>
-      </div>
-    </div>
-    <div class="filter-divider"></div>
-    <div class="filter-section">
-      <span class="filter-label">Agent</span>
-      <div class="filter-chips" id="agentChipsMobile">
-        <div class="chip active" data-agent="All" onclick="selectChip(this,'agent')">All Agents</div>
-      </div>
-    </div>
-    <div style="margin-top:18px">
-      <button class="btn-primary" style="width:100%;padding:11px" onclick="closeMobileSidebar()">Apply Filters</button>
+      <div class="modal-body" id="modalBody"></div>
     </div>
   </div>
-</div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
+  <!-- AGENT MODAL -->
+  <div class="modal-backdrop" id="agentModalBackdrop" onclick="handleAgentBackdropClick(event)">
+    <div class="modal" id="agentModal">
+      <div id="agentModalContent"></div>
+    </div>
+  </div>
 
-<footer>
-  <strong>Lodge</strong> — Connecting students to verified housing, simply.<br/>
-  Now available in Nsukka and Enugu.<br/>
-  All listings are sourced from agent WhatsApp groups. Confirm all details directly with the agent.
-</footer>
+  <!-- MOBILE SIDEBAR -->
+  <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+  <div class="mobile-sidebar" id="mobileSidebar">
+    <button class="mobile-sidebar-close" onclick="closeMobileSidebar()">✕</button>
+    <div style="margin-top:12px">
+      <div class="filter-section">
+        <span class="filter-label">Room Type</span>
+        <div class="filter-chips" id="typeChipsMobile">
+          <div class="chip active" data-type="All" onclick="selectChip(this,'type')">All</div>
+          <div class="chip" data-type="Single" onclick="selectChip(this,'type')">Single</div>
+          <div class="chip" data-type="Self-Contain" onclick="selectChip(this,'type')">Self-Contain</div>
+          <div class="chip" data-type="Shared" onclick="selectChip(this,'type')">Shared</div>
+          <div class="chip" data-type="Flat" onclick="selectChip(this,'type')">Flat</div>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-section">
+        <span class="filter-label">Max Price</span>
+        <div class="price-range">
+          <input type="range" class="range-input" min="80000" max="600000" step="10000" value="600000"
+            oninput="updatePrice(this)" />
+          <div class="range-labels"><span>₦80k</span><span>₦600k</span></div>
+          <div class="range-value">Up to ₦600,000</div>
+        </div>
+      </div>
+      <div class="filter-divider"></div>
+      <div class="filter-section">
+        <span class="filter-label">Agent</span>
+        <div class="filter-chips" id="agentChipsMobile">
+          <div class="chip active" data-agent="All" onclick="selectChip(this,'agent')">All Agents</div>
+        </div>
+      </div>
+      <div style="margin-top:18px">
+        <button class="btn-primary" style="width:100%;padding:11px" onclick="closeMobileSidebar()">Apply
+          Filters</button>
+      </div>
+    </div>
+  </div>
 
-<script src="https://unpkg.com/convex@1.3.1/dist/browser.bundle.js"></script>
-<script>
-// ─────────────────────────────────────────────────────────────────────────────
-// CONFIG
-// ─────────────────────────────────────────────────────────────────────────────
-const CONVEX_URL = "https://youthful-wildebeest-612.convex.cloud";
-const CLOUDINARY_CLOUD_NAME = 'do1jh1eac';
-const CLOUDINARY_UPLOAD_PRESET = 'nmhlfto6';
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CONVEX CLIENT
-// ─────────────────────────────────────────────────────────────────────────────
-const client = new convex.ConvexClient(CONVEX_URL);
+  <footer>
+    <strong>Lodge</strong> — Connecting students to verified housing,
+    simply.<br />
+    Now available in Nsukka and Enugu.<br />
+    All listings are sourced from agent WhatsApp groups. Confirm all details
+    directly with the agent.
+  </footer>
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-// Raw data from Convex
-let allListings = [];   // full listing objects (with .agent embedded)
-let allAgents   = [];   // agent objects from getAgents
+  <script src="https://unpkg.com/convex@1.3.1/dist/browser.bundle.js"></script>
+  <script>
+    // ─────────────────────────────────────────────────────────────────────────────
+    // CONFIG
+    // ─────────────────────────────────────────────────────────────────────────────
+    const CONVEX_URL = "https://youthful-wildebeest-612.convex.cloud";
+    const CLOUDINARY_CLOUD_NAME = 'do1jh1eac';
+    const CLOUDINARY_UPLOAD_PRESET = 'nmhlfto6';
 
-// Active UI filter state
-const state = {
-  type: 'All', maxPrice: 600000, dist: 'All',
-  avail: 'All', water: false, elec: false,
-  agent: 'All',
-  sort: 'price', sortDir: 1, search: '',
-};
+    // ─────────────────────────────────────────────────────────────────────────────
+    // CONVEX CLIENT
+    // ─────────────────────────────────────────────────────────────────────────────
+    const client = new convex.ConvexClient(CONVEX_URL);
 
-// Track the active Convex subscription unsubscribe functions
-let listingsUnsub = null;
-let agentsUnsub   = null;
+    // ── STATE ─────────────────────────────────────────────────────────────────────
+    // Raw data from Convex
+    let allListings = [];   // full listing objects (with .agent embedded)
+    let allAgents = [];   // agent objects from getAgents
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-const fmt = n => '₦' + n.toLocaleString('en-NG');
-const daysLabel = d => d === 0 ? 'Today' : d === 1 ? 'Yesterday' : `${d} days ago`;
+    // Active UI filter state
+    const state = {
+      type: 'All', maxPrice: 600000, dist: 'All',
+      avail: 'All', water: false, elec: false,
+      agent: 'All',
+      sort: 'price', sortDir: 1, search: '',
+    };
 
-// Look up an agent from the embedded .agent field or from allAgents cache
-function getAgent(listing) {
-  // listings returned by getListings have an embedded `agent` field
-  if (listing.agent) return listing.agent;
-  // fallback to allAgents cache
-  return allAgents.find(a => a._id === listing.agentId) || {};
-}
+    // Track the active Convex subscription unsubscribe functions
+    let listingsUnsub = null;
+    let agentsUnsub = null;
 
-function badgeHTML(l) {
-  let b = '';
-  if (l.verified)         b += `<span class="badge badge-verified">✓ Verified</span>`;
-  if (l.badge === 'fire') b += `<span class="badge badge-fire">${l.badgeLabel}</span>`;
-  if (l.badge === 'warn') b += `<span class="badge badge-warn">${l.badgeLabel}</span>`;
-  if (l.badge === 'fast') b += `<span class="badge badge-fast">${l.badgeLabel}</span>`;
-  return b;
-}
+    // ── HELPERS ───────────────────────────────────────────────────────────────────
+    const fmt = n => '₦' + n.toLocaleString('en-NG');
+    const daysLabel = d => d === 0 ? 'Today' : d === 1 ? 'Yesterday' : `${d} days ago`;
 
-// ── FILTER & SORT (client-side, operates on allListings) ──────────────────────
-function getFiltered() {
-  return allListings
-    .filter(l => {
-      if (state.type !== 'All' && l.type !== state.type) return false;
-      if (l.price > state.maxPrice) return false;
-      if (state.dist !== 'All' && l.distMin > parseInt(state.dist)) return false;
-      if (state.avail !== 'All' && l.availability !== state.avail) return false;
-      if (state.water && !l.water) return false;
-      if (state.elec && !l.elec) return false;
-      if (state.agent !== 'All' && l.agentId !== state.agent) return false;
-      if (state.search) {
-        const q = state.search.toLowerCase();
-        if (!l.title.toLowerCase().includes(q) && !l.area.toLowerCase().includes(q)) return false;
+    // Look up an agent from the embedded .agent field or from allAgents cache
+    function getAgent(listing) {
+      // listings returned by getListings have an embedded `agent` field
+      if (listing.agent) return listing.agent;
+      // fallback to allAgents cache
+      return allAgents.find(a => a._id === listing.agentId) || {};
+    }
+
+    function badgeHTML(l) {
+      let b = '';
+      if (l.verified) b += `<span class="badge badge-verified">✓ Verified</span>`;
+      if (l.badge === 'fire') b += `<span class="badge badge-fire">${l.badgeLabel}</span>`;
+      if (l.badge === 'warn') b += `<span class="badge badge-warn">${l.badgeLabel}</span>`;
+      if (l.badge === 'fast') b += `<span class="badge badge-fast">${l.badgeLabel}</span>`;
+      return b;
+    }
+
+    // ── FILTER & SORT (client-side, operates on allListings) ──────────────────────
+    function getFiltered() {
+      return allListings
+        .filter(l => {
+          if (state.type !== 'All' && l.type !== state.type) return false;
+          if (l.price > state.maxPrice) return false;
+          if (state.dist !== 'All' && l.distMin > parseInt(state.dist)) return false;
+          if (state.avail !== 'All' && l.availability !== state.avail) return false;
+          if (state.water && !l.water) return false;
+          if (state.elec && !l.elec) return false;
+          if (state.agent !== 'All' && l.agentId !== state.agent) return false;
+          if (state.search) {
+            const q = state.search.toLowerCase();
+            if (!l.title.toLowerCase().includes(q) && !l.area.toLowerCase().includes(q)) return false;
+          }
+          return true;
+        })
+        .sort((a, b) => {
+          if (state.sort === 'price') return (a.price - b.price) * state.sortDir;
+          if (state.sort === 'dist') return (a.distMin - b.distMin) * state.sortDir;
+          if (state.sort === 'new') return (a.daysAgo - b.daysAgo) * state.sortDir;
+          return 0;
+        });
+    }
+
+    // ── RENDER ─────────────────────────────────────────────────────────────────────
+    function renderListings() {
+      const data = getFiltered();
+      const grid = document.getElementById('listingsGrid');
+      const empty = document.getElementById('emptyState');
+      const count = document.getElementById('resultsCount');
+
+      count.innerHTML = `<strong>${data.length}</strong> room${data.length !== 1 ? 's' : ''} found`;
+
+      if (!data.length) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
       }
-      return true;
-    })
-    .sort((a, b) => {
-      if (state.sort === 'price') return (a.price - b.price) * state.sortDir;
-      if (state.sort === 'dist')  return (a.distMin - b.distMin) * state.sortDir;
-      if (state.sort === 'new')   return (a.daysAgo - b.daysAgo) * state.sortDir;
-      return 0;
-    });
-}
+      empty.style.display = 'none';
+      grid.innerHTML = data.map(l => cardHTML(l)).join('');
+      updateHeroStats(data);
+    }
 
-// ── RENDER ─────────────────────────────────────────────────────────────────────
-function renderListings() {
-  const data  = getFiltered();
-  const grid  = document.getElementById('listingsGrid');
-  const empty = document.getElementById('emptyState');
-  const count = document.getElementById('resultsCount');
+    function updateHeroStats(data) {
+      document.getElementById('statRooms').innerHTML = `<strong>${data.length}</strong> verified rooms`;
+      const today = data.filter(l => l.daysAgo === 0).length;
+      document.getElementById('statToday').innerHTML = `<strong>${today}</strong> rooms added today`;
+    }
 
-  count.innerHTML = `<strong>${data.length}</strong> room${data.length !== 1 ? 's' : ''} found`;
+    function cardHTML(l) {
+      const ag = getAgent(l);
+      const waMsg = encodeURIComponent(`Hello, I saw the ${l.type} at ${l.area} (${fmt(l.price)}) on Lodge. Is it still available?`);
+      const waLink = `https://wa.me/${ag.phone}?text=${waMsg}`;
+      const hasVideo = !!l.videoUrl;
+      const roomsLeftLabel = l.roomsLeftConfirmed != null
+        ? `<span>🏠 ${l.roomsLeftConfirmed} room${l.roomsLeftConfirmed > 1 ? 's' : ''} left</span>`
+        : '';
 
-  if (!data.length) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-  grid.innerHTML = data.map(l => cardHTML(l)).join('');
-  updateHeroStats(data);
-}
+      // Safely encode the listing ID for use in onclick attributes
+      const listingId = l._id;
 
-function updateHeroStats(data) {
-  document.getElementById('statRooms').innerHTML = `<strong>${data.length}</strong> verified rooms`;
-  const today = data.filter(l => l.daysAgo === 0).length;
-  document.getElementById('statToday').innerHTML = `<strong>${today}</strong> rooms added today`;
-}
-
-function cardHTML(l) {
-  const ag = getAgent(l);
-  const waMsg  = encodeURIComponent(`Hello, I saw the ${l.type} at ${l.area} (${fmt(l.price)}) on Lodge. Is it still available?`);
-  const waLink = `https://wa.me/${ag.phone}?text=${waMsg}`;
-  const hasVideo = !!l.videoUrl;
-  const roomsLeftLabel = l.roomsLeftConfirmed != null
-    ? `<span>🏠 ${l.roomsLeftConfirmed} room${l.roomsLeftConfirmed > 1 ? 's' : ''} left</span>`
-    : '';
-
-  // Safely encode the listing ID for use in onclick attributes
-  const listingId = l._id;
-
-  return `
+      return `
   <div class="card" onclick="openModal('${listingId}')">
     <div class="card-media">
-      <img src="${l.img}" alt="${l.title}" loading="lazy"/>
-      <div class="card-media-overlay"></div>
-      <div class="video-badge ${hasVideo ? 'has-video' : 'no-video'}"
-           onclick="${hasVideo
-             ? `event.stopPropagation();openModalVideo('${listingId}')`
-             : `event.stopPropagation();showToast('No video yet for this listing')`}"
-           title="${hasVideo ? 'Play video' : 'No video available'}">
-        ▶ ${hasVideo ? 'Video' : 'No video'}
+  ${hasVideo ? `
+    <div class="play-overlay" onclick="event.stopPropagation();openModalVideo('${listingId}')">
+      <div class="play-btn-ring">
+        <div class="play-btn-inner"><div class="play-icon"></div></div>
       </div>
-      <div class="card-badges">${badgeHTML(l)}</div>
-      <a class="card-wa-btn" href="${waLink}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp agent">
-        <svg viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-      </a>
+      <div class="play-label">Watch Video</div>
     </div>
+    ${l.videoDuration ? `<div class="video-duration">${l.videoDuration}</div>` : ''}
+  ` : `
+    <img src="${l.img}" alt="${l.title}" loading="lazy"/>
+    <div class="card-media-overlay"></div>
+  `}
+  <div class="card-badges">${badgeHTML(l)}</div>
+  <a class="card-wa-btn" href="${waLink}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp agent">
+    <svg viewBox="0 0 24 24" fill="white">...</svg>
+  </a>
+</div>
     <div class="card-body">
       <div class="card-social">
         <span class="card-social-item">👁 ${l.views} today</span>
@@ -912,43 +2063,42 @@ function cardHTML(l) {
       </div>
     </div>
   </div>`;
-}
+    }
 
-// ── MODAL ─────────────────────────────────────────────────────────────────────
-function openModal(id, startVideo = false) {
-  const l = allListings.find(x => x._id === id);
-  if (!l) return;
-  const ag = getAgent(l);
-  const hasVideo = !!l.videoUrl;
+    // ── MODAL ─────────────────────────────────────────────────────────────────────
+    function openModal(id, startVideo = false) {
+      const l = allListings.find(x => x._id === id);
+      if (!l) return;
+      const ag = getAgent(l);
+      const hasVideo = !!l.videoUrl;
 
-  // Fire-and-forget view increment via Convex mutation
-  client.mutation("listings:incrementViews", { listingId: id }).catch(() => {});
+      // Fire-and-forget view increment via Convex mutation
+      client.mutation("listings:incrementViews", { listingId: id }).catch(() => { });
 
-  // Update local view count optimistically
-  l.views = (l.views || 0) + 1;
+      // Update local view count optimistically
+      l.views = (l.views || 0) + 1;
 
-  // Media tabs
-  const tabsHTML = hasVideo ? `
-    <button class="media-tab active" id="tabPhoto" onclick="switchMediaTab('photo','${id}')">📷 Photo</button>
+      // Media tabs
+      const tabsHTML = hasVideo ? `
     <button class="media-tab" id="tabVideo" onclick="switchMediaTab('video','${id}')">▶ Video</button>
   ` : '';
 
-  document.getElementById('modalMediaTabs').innerHTML = tabsHTML;
-  document.getElementById('modalImg').src = l.img;
-  document.getElementById('modalImg').style.display = 'block';
+      document.getElementById('modalMediaTabs').innerHTML = tabsHTML;
+      document.getElementById('modalImg').src = l.img;
+      document.getElementById('modalImg').style.display = 'block';
 
-  const existingVid = document.getElementById('modalVideo');
-  if (existingVid) existingVid.remove();
+      const existingVid = document.getElementById('modalVideo');
+      if (existingVid) existingVid.remove();
 
-  document.getElementById('modalBadges').innerHTML = badgeHTML(l);
+      document.getElementById('modalBadges').innerHTML = badgeHTML(l);
 
-  const waMsg  = encodeURIComponent(`Hello, I saw the ${l.type} at ${l.area} (${fmt(l.price)}) on Lodge. Is it still available?`);
-  const waLink = `https://wa.me/${ag.phone}?text=${waMsg}`;
+      const waMsg = encodeURIComponent(`Hello, I saw the ${l.type} at ${l.area} (${fmt(l.price)}) on Lodge. Is it still available?`);
+      const waLink = `https://wa.me/${ag.phone}?text=${waMsg}`;
 
-  let breakdownHTML = '';
-  if (l.breakdown && l.breakdownConfirmed) {
-    const total = Object.values(l.breakdown).reduce((a, b) => a + b, 0);
-    breakdownHTML = `
+      let breakdownHTML = '';
+      if (l.breakdown && l.breakdownConfirmed) {
+        const total = Object.values(l.breakdown).reduce((a, b) => a + b, 0);
+        breakdownHTML = `
       <div class="breakdown-title">Price Breakdown</div>
       <div class="breakdown-rows">
         <div class="breakdown-row"><span class="label">Rent</span><span class="value">${fmt(l.breakdown.rent)}</span></div>
@@ -957,20 +2107,20 @@ function openModal(id, startVideo = false) {
         <div class="breakdown-row"><span class="label">Caution Deposit</span><span class="value">${fmt(l.breakdown.caution)}</span></div>
         <div class="breakdown-row total"><span class="label">Total First Payment</span><span class="value">${fmt(total)}</span></div>
       </div>`;
-  } else {
-    breakdownHTML = `
+      } else {
+        breakdownHTML = `
       <div class="breakdown-title">Price Breakdown</div>
       <div class="breakdown-rows">
         <div class="breakdown-row"><span class="label">Total (Full Payment)</span><span class="value">${fmt(l.price)}</span></div>
       </div>
       <div class="breakdown-note">⚠️ Detailed breakdown not confirmed by agent. <strong>Confirm all costs before proceeding.</strong></div>`;
-  }
+      }
 
-  const roomsLeftLabel = l.roomsLeftConfirmed != null
-    ? `<div class="spb-item">🏠 <span>${l.roomsLeftConfirmed} room${l.roomsLeftConfirmed > 1 ? 's' : ''} left</span></div>`
-    : '';
+      const roomsLeftLabel = l.roomsLeftConfirmed != null
+        ? `<div class="spb-item">🏠 <span>${l.roomsLeftConfirmed} room${l.roomsLeftConfirmed > 1 ? 's' : ''} left</span></div>`
+        : '';
 
-  document.getElementById('modalBody').innerHTML = `
+      document.getElementById('modalBody').innerHTML = `
     <div class="social-proof-bar">
       <div class="spb-item">👁 <span>${l.views} viewed today</span></div>
       ${roomsLeftLabel}
@@ -1017,65 +2167,65 @@ function openModal(id, startVideo = false) {
     </button>
   `;
 
-  document.getElementById('modalBackdrop').classList.add('open');
-  document.body.style.overflow = 'hidden';
+      document.getElementById('modalBackdrop').classList.add('open');
+      document.body.style.overflow = 'hidden';
 
-  if (startVideo && hasVideo) switchMediaTab('video', id);
-}
-
-function openModalVideo(id) { openModal(id, true); }
-
-function switchMediaTab(tab, id) {
-  const l   = allListings.find(x => x._id === id);
-  const img = document.getElementById('modalImg');
-  const tabPhoto = document.getElementById('tabPhoto');
-  const tabVideo = document.getElementById('tabVideo');
-  let vid = document.getElementById('modalVideo');
-
-  if (tab === 'video' && l && l.videoUrl) {
-    img.style.display = 'none';
-    if (!vid) {
-      vid = document.createElement('video');
-      vid.id = 'modalVideo';
-      vid.controls = true;
-      vid.autoplay = true;
-      vid.style.cssText = 'width:100%;height:100%;object-fit:cover';
-      document.getElementById('modalMedia').appendChild(vid);
+      if (startVideo && hasVideo) switchMediaTab('video', id);
     }
-    vid.src = l.videoUrl;
-    vid.style.display = 'block';
-    if (tabPhoto) tabPhoto.classList.remove('active');
-    if (tabVideo) tabVideo.classList.add('active');
-  } else {
-    img.style.display = 'block';
-    if (vid) { vid.pause(); vid.style.display = 'none'; }
-    if (tabPhoto) tabPhoto.classList.add('active');
-    if (tabVideo) tabVideo.classList.remove('active');
-  }
-}
 
-function closeModal() {
-  const vid = document.getElementById('modalVideo');
-  if (vid) vid.pause();
-  document.getElementById('modalBackdrop').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function handleBackdropClick(e) {
-  if (e.target === document.getElementById('modalBackdrop')) closeModal();
-}
+    function openModalVideo(id) { openModal(id, true); }
 
-// ── AGENT MODAL ───────────────────────────────────────────────────────────────
-function openAgentModal(agentId) {
-  // Query Convex for full agent details (includes their listings array)
-  client.query("agents:getAgentById", { agentId })
-    .then(ag => {
-      if (!ag) { showToast('Agent not found'); return; }
+    function switchMediaTab(tab, id) {
+      const l = allListings.find(x => x._id === id);
+      const img = document.getElementById('modalImg');
+      // const tabPhoto = document.getElementById('tabPhoto');
+      const tabVideo = document.getElementById('tabVideo');
+      let vid = document.getElementById('modalVideo');
 
-      // ag.listings here is the array of listing objects from getAgentById
-      const agListings = Array.isArray(ag.listings) ? ag.listings : [];
-      const waLink = `https://wa.me/${ag.phone}?text=${encodeURIComponent('Hello, I found you on Lodge and would like to inquire about your listings.')}`;
+      if (tab === 'video' && l && l.videoUrl) {
+        img.style.display = 'none';
+        if (!vid) {
+          vid = document.createElement('video');
+          vid.id = 'modalVideo';
+          vid.controls = true;
+          vid.autoplay = true;
+          vid.style.cssText = 'width:100%;height:100%;object-fit:cover';
+          document.getElementById('modalMedia').appendChild(vid);
+        }
+        vid.src = l.videoUrl;
+        vid.style.display = 'block';
+        // if (tabPhoto) tabPhoto.classList.remove('active');
+        if (tabVideo) tabVideo.classList.add('active');
+      } else {
+        img.style.display = 'block';
+        if (vid) { vid.pause(); vid.style.display = 'none'; }
+        // if (tabPhoto) tabPhoto.classList.add('active');
+        if (tabVideo) tabVideo.classList.remove('active');
+      }
+    }
 
-      document.getElementById('agentModalContent').innerHTML = `
+    function closeModal() {
+      const vid = document.getElementById('modalVideo');
+      if (vid) vid.pause();
+      document.getElementById('modalBackdrop').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function handleBackdropClick(e) {
+      if (e.target === document.getElementById('modalBackdrop')) closeModal();
+    }
+
+    // ── AGENT MODAL ───────────────────────────────────────────────────────────────
+    function openAgentModal(agentId) {
+      // Query Convex for full agent details (includes their listings array)
+      client.query("agents:getAgentById", { agentId })
+        .then(ag => {
+          if (!ag) { showToast('Agent not found'); return; }
+
+          // ag.listings here is the array of listing objects from getAgentById
+          const agListings = Array.isArray(ag.listings) ? ag.listings : [];
+          const waLink = `https://wa.me/${ag.phone}?text=${encodeURIComponent('Hello, I found you on Lodge and would like to inquire about your listings.')}`;
+
+          document.getElementById('agentModalContent').innerHTML = `
         <button class="agent-back" onclick="closeAgentModal()">← Back to listings</button>
         <div class="agent-modal-header">
           <div class="agent-modal-avatar">${ag.name[0]}</div>
@@ -1105,260 +2255,261 @@ function openAgentModal(agentId) {
         </div>
       `;
 
-      document.getElementById('agentModalBackdrop').classList.add('open');
-      document.body.style.overflow = 'hidden';
-    })
-    .catch(err => {
-      console.error('Failed to load agent:', err);
-      showToast('Failed to load agent details');
-    });
-}
-
-function closeAgentModal() {
-  document.getElementById('agentModalBackdrop').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function handleAgentBackdropClick(e) {
-  if (e.target === document.getElementById('agentModalBackdrop')) closeAgentModal();
-}
-
-// ── AGENT FILTER CHIPS ────────────────────────────────────────────────────────
-function buildAgentChips() {
-  const containers = ['agentChips', 'agentChipsMobile'];
-  containers.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.innerHTML = `<div class="chip active" data-agent="All" onclick="selectChip(this,'agent')">All Agents</div>`;
-    allAgents.forEach(ag => {
-      el.innerHTML += `<div class="chip" data-agent="${ag._id}" onclick="selectChip(this,'agent')">${ag.name.split(' ')[0]}</div>`;
-    });
-  });
-  // Update the "agents active" hero stat
-  const heroAgentStat = document.querySelector('.hero-stat:nth-child(2)');
-  if (heroAgentStat) heroAgentStat.innerHTML = `<strong>${allAgents.length}</strong> agents active`;
-}
-
-// ── CONVEX SUBSCRIPTIONS (real-time) ──────────────────────────────────────────
-function initConvexSubscriptions() {
-  // Subscribe to listings (getListings query — live updates)
-  // We fetch all listings and do client-side filtering/sorting
-  listingsUnsub = client.onUpdate(
-    "listings:getListings",
-    { limit: 100 },   // fetch up to 100 listings; adjust as needed
-    (result) => {
-      if (result && result.listings) {
-        allListings = result.listings;
-        hideSkeleton();
-        renderListings();
-      }
+          document.getElementById('agentModalBackdrop').classList.add('open');
+          document.body.style.overflow = 'hidden';
+        })
+        .catch(err => {
+          console.error('Failed to load agent:', err);
+          showToast('Failed to load agent details');
+        });
     }
-  );
 
-  // Subscribe to agents
-  agentsUnsub = client.onUpdate(
-    "agents:getAgents",
-    { limit: 50 },
-    (result) => {
-      if (Array.isArray(result)) {
-        allAgents = result;
-        buildAgentChips();
-      }
+    function closeAgentModal() {
+      document.getElementById('agentModalBackdrop').classList.remove('open');
+      document.body.style.overflow = '';
     }
-  );
-
-  // Mark connection as live after first successful callback
-  setTimeout(() => {
-    document.getElementById('convexDot').classList.add('live');
-    document.getElementById('convexLabel').textContent = 'live';
-  }, 1500);
-}
-
-function hideSkeleton() {
-  const skeleton = document.getElementById('skeletonGrid');
-  const grid     = document.getElementById('listingsGrid');
-  if (skeleton) skeleton.style.display = 'none';
-  if (grid)     grid.style.display = 'grid';
-}
-
-// ── CONTROLS ──────────────────────────────────────────────────────────────────
-function selectChip(el, group) {
-  const val = el.dataset[group] || el.dataset.type || el.dataset.dist || el.dataset.avail || el.dataset.agent;
-  const maps = {
-    type:  ['typeChips', 'typeChipsMobile'],
-    dist:  ['distChips'],
-    avail: ['availChips'],
-    agent: ['agentChips', 'agentChipsMobile'],
-  };
-  (maps[group] || []).forEach(cid => {
-    const c = document.getElementById(cid);
-    if (c) c.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
-  });
-  document.querySelectorAll(`[data-${group}="${val}"]`).forEach(c => c.classList.add('active'));
-  state[group] = val;
-  renderListings();
-}
-
-function updatePrice(input) {
-  state.maxPrice = parseInt(input.value);
-  document.querySelectorAll('.range-value').forEach(el => {
-    el.textContent = `Up to ₦${parseInt(input.value).toLocaleString('en-NG')}`;
-  });
-  document.querySelectorAll('.range-input').forEach(el => el.value = input.value);
-  renderListings();
-}
-
-function toggleAmenity(key, el) {
-  state[key] = !state[key];
-  el.classList.toggle('active', state[key]);
-  renderListings();
-}
-
-function filterListings() {
-  state.search = document.getElementById('searchInput').value;
-  renderListings();
-}
-
-let sortDirs = { price: 1, dist: 1, new: 1 };
-function setSort(key, el) {
-  if (state.sort === key) {
-    sortDirs[key] *= -1;
-    state.sortDir = sortDirs[key];
-    const a = document.getElementById(`arrow-${key}`);
-    if (a) a.textContent = sortDirs[key] === 1 ? '↑' : '↓';
-  } else {
-    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    state.sort = key; state.sortDir = 1; sortDirs[key] = 1;
-  }
-  renderListings();
-}
-
-function openMobileSidebar() {
-  document.getElementById('mobileSidebar').classList.add('open');
-  document.getElementById('mobileOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeMobileSidebar() {
-  document.getElementById('mobileSidebar').classList.remove('open');
-  document.getElementById('mobileOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-// ── TOAST ─────────────────────────────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-function showComingSoon(feature) {
-  showToast(`${feature} coming soon — stay tuned! 🚀`);
-}
-
-// ── UPLOAD (Cloudinary) ───────────────────────────────────────────────────────
-function openUploadModal() {
-  document.getElementById('uploadModalBackdrop').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeUploadModal() {
-  document.getElementById('uploadModalBackdrop').classList.remove('open');
-  document.body.style.overflow = '';
-  document.getElementById('uploadProgress').style.display = 'none';
-  document.getElementById('uploadResult').style.display = 'none';
-  document.getElementById('uploadProgressBar').style.width = '0%';
-  document.getElementById('fileInput').value = '';
-}
-function handleUploadBackdropClick(e) {
-  if (e.target === document.getElementById('uploadModalBackdrop')) closeUploadModal();
-}
-function handleDragOver(e) {
-  e.preventDefault();
-  document.getElementById('uploadZone').classList.add('dragging');
-}
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('uploadZone').classList.remove('dragging');
-  const file = e.dataTransfer.files[0];
-  if (file) uploadToCloudinary(file);
-}
-function handleFileSelect(e) {
-  const file = e.target.files[0];
-  if (file) uploadToCloudinary(file);
-}
-
-function uploadToCloudinary(file) {
-  const isVideo   = file.type.startsWith('video/');
-  const progressEl = document.getElementById('uploadProgress');
-  const bar        = document.getElementById('uploadProgressBar');
-  const pct        = document.getElementById('uploadPercent');
-  const fname      = document.getElementById('uploadFileName');
-  const resultEl   = document.getElementById('uploadResult');
-
-  progressEl.style.display = 'block';
-  resultEl.style.display   = 'none';
-  fname.textContent = file.name;
-  pct.textContent   = '0%';
-  bar.style.width   = '0%';
-
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-  formData.append('cloud_name', CLOUDINARY_CLOUD_NAME);
-
-  const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${isVideo ? 'video' : 'image'}/upload`;
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', url);
-
-  xhr.upload.onprogress = e => {
-    if (e.lengthComputable) {
-      const p = Math.round((e.loaded / e.total) * 100);
-      bar.style.width = p + '%';
-      pct.textContent = p + '%';
+    function handleAgentBackdropClick(e) {
+      if (e.target === document.getElementById('agentModalBackdrop')) closeAgentModal();
     }
-  };
 
-  xhr.onload = () => {
-    progressEl.style.display = 'none';
-    try {
-      const res = JSON.parse(xhr.responseText);
-      if (res.secure_url) {
-        resultEl.style.display = 'block';
-        document.getElementById('uploadResultUrl').textContent = res.secure_url;
-        if (isVideo) {
-          document.getElementById('uploadResultPreview').style.display = 'none';
-          const vid = document.getElementById('uploadResultVideo');
-          vid.src = res.secure_url;
-          vid.style.display = 'block';
-        } else {
-          document.getElementById('uploadResultVideo').style.display = 'none';
-          const img = document.getElementById('uploadResultPreview');
-          img.src = res.secure_url;
-          img.style.display = 'block';
+    // ── AGENT FILTER CHIPS ────────────────────────────────────────────────────────
+    function buildAgentChips() {
+      const containers = ['agentChips', 'agentChipsMobile'];
+      containers.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerHTML = `<div class="chip active" data-agent="All" onclick="selectChip(this,'agent')">All Agents</div>`;
+        allAgents.forEach(ag => {
+          el.innerHTML += `<div class="chip" data-agent="${ag._id}" onclick="selectChip(this,'agent')">${ag.name.split(' ')[0]}</div>`;
+        });
+      });
+      // Update the "agents active" hero stat
+      const heroAgentStat = document.querySelector('.hero-stat:nth-child(2)');
+      if (heroAgentStat) heroAgentStat.innerHTML = `<strong>${allAgents.length}</strong> agents active`;
+    }
+
+    // ── CONVEX SUBSCRIPTIONS (real-time) ──────────────────────────────────────────
+    function initConvexSubscriptions() {
+      // Subscribe to listings (getListings query — live updates)
+      // We fetch all listings and do client-side filtering/sorting
+      listingsUnsub = client.onUpdate(
+        "listings:getListings",
+        { limit: 100 },   // fetch up to 100 listings; adjust as needed
+        (result) => {
+          if (result && result.listings) {
+            allListings = result.listings;
+            hideSkeleton();
+            renderListings();
+          }
         }
-        showToast('✅ Uploaded successfully!');
-      } else {
-        showToast('Upload failed: ' + (res.error?.message || 'Unknown error'));
-      }
-    } catch (err) {
-      showToast('Upload error. Check Cloudinary config.');
+      );
+
+      // Subscribe to agents
+      agentsUnsub = client.onUpdate(
+        "agents:getAgents",
+        { limit: 50 },
+        (result) => {
+          if (Array.isArray(result)) {
+            allAgents = result;
+            buildAgentChips();
+          }
+        }
+      );
+
+      // Mark connection as live after first successful callback
+      setTimeout(() => {
+        document.getElementById('convexDot').classList.add('live');
+        document.getElementById('convexLabel').textContent = 'live';
+      }, 1500);
     }
-  };
 
-  xhr.onerror = () => {
-    progressEl.style.display = 'none';
-    showToast('Network error during upload.');
-  };
+    function hideSkeleton() {
+      const skeleton = document.getElementById('skeletonGrid');
+      const grid = document.getElementById('listingsGrid');
+      if (skeleton) skeleton.style.display = 'none';
+      if (grid) grid.style.display = 'grid';
+    }
 
-  xhr.send(formData);
-}
+    // ── CONTROLS ──────────────────────────────────────────────────────────────────
+    function selectChip(el, group) {
+      const val = el.dataset[group] || el.dataset.type || el.dataset.dist || el.dataset.avail || el.dataset.agent;
+      const maps = {
+        type: ['typeChips', 'typeChipsMobile'],
+        dist: ['distChips'],
+        avail: ['availChips'],
+        agent: ['agentChips', 'agentChipsMobile'],
+      };
+      (maps[group] || []).forEach(cid => {
+        const c = document.getElementById(cid);
+        if (c) c.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+      });
+      document.querySelectorAll(`[data-${group}="${val}"]`).forEach(c => c.classList.add('active'));
+      state[group] = val;
+      renderListings();
+    }
 
-function copyUploadUrl() {
-  const url = document.getElementById('uploadResultUrl').textContent;
-  navigator.clipboard.writeText(url).then(() => showToast('URL copied!'));
-}
+    function updatePrice(input) {
+      state.maxPrice = parseInt(input.value);
+      document.querySelectorAll('.range-value').forEach(el => {
+        el.textContent = `Up to ₦${parseInt(input.value).toLocaleString('en-NG')}`;
+      });
+      document.querySelectorAll('.range-input').forEach(el => el.value = input.value);
+      renderListings();
+    }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-initConvexSubscriptions();
-</script>
+    function toggleAmenity(key, el) {
+      state[key] = !state[key];
+      el.classList.toggle('active', state[key]);
+      renderListings();
+    }
+
+    function filterListings() {
+      state.search = document.getElementById('searchInput').value;
+      renderListings();
+    }
+
+    let sortDirs = { price: 1, dist: 1, new: 1 };
+    function setSort(key, el) {
+      if (state.sort === key) {
+        sortDirs[key] *= -1;
+        state.sortDir = sortDirs[key];
+        const a = document.getElementById(`arrow-${key}`);
+        if (a) a.textContent = sortDirs[key] === 1 ? '↑' : '↓';
+      } else {
+        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        state.sort = key; state.sortDir = 1; sortDirs[key] = 1;
+      }
+      renderListings();
+    }
+
+    function openMobileSidebar() {
+      document.getElementById('mobileSidebar').classList.add('open');
+      document.getElementById('mobileOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMobileSidebar() {
+      document.getElementById('mobileSidebar').classList.remove('open');
+      document.getElementById('mobileOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // ── TOAST ─────────────────────────────────────────────────────────────────────
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+    function showComingSoon(feature) {
+      showToast(`${feature} coming soon — stay tuned! 🚀`);
+    }
+
+    // ── UPLOAD (Cloudinary) ───────────────────────────────────────────────────────
+    function openUploadModal() {
+      document.getElementById('uploadModalBackdrop').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeUploadModal() {
+      document.getElementById('uploadModalBackdrop').classList.remove('open');
+      document.body.style.overflow = '';
+      document.getElementById('uploadProgress').style.display = 'none';
+      document.getElementById('uploadResult').style.display = 'none';
+      document.getElementById('uploadProgressBar').style.width = '0%';
+      document.getElementById('fileInput').value = '';
+    }
+    function handleUploadBackdropClick(e) {
+      if (e.target === document.getElementById('uploadModalBackdrop')) closeUploadModal();
+    }
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.getElementById('uploadZone').classList.add('dragging');
+    }
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('uploadZone').classList.remove('dragging');
+      const file = e.dataTransfer.files[0];
+      if (file) uploadToCloudinary(file);
+    }
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) uploadToCloudinary(file);
+    }
+
+    function uploadToCloudinary(file) {
+      const isVideo = file.type.startsWith('video/');
+      const progressEl = document.getElementById('uploadProgress');
+      const bar = document.getElementById('uploadProgressBar');
+      const pct = document.getElementById('uploadPercent');
+      const fname = document.getElementById('uploadFileName');
+      const resultEl = document.getElementById('uploadResult');
+
+      progressEl.style.display = 'block';
+      resultEl.style.display = 'none';
+      fname.textContent = file.name;
+      pct.textContent = '0%';
+      bar.style.width = '0%';
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      formData.append('cloud_name', CLOUDINARY_CLOUD_NAME);
+
+      const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${isVideo ? 'video' : 'image'}/upload`;
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url);
+
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) {
+          const p = Math.round((e.loaded / e.total) * 100);
+          bar.style.width = p + '%';
+          pct.textContent = p + '%';
+        }
+      };
+
+      xhr.onload = () => {
+        progressEl.style.display = 'none';
+        try {
+          const res = JSON.parse(xhr.responseText);
+          if (res.secure_url) {
+            resultEl.style.display = 'block';
+            document.getElementById('uploadResultUrl').textContent = res.secure_url;
+            if (isVideo) {
+              document.getElementById('uploadResultPreview').style.display = 'none';
+              const vid = document.getElementById('uploadResultVideo');
+              vid.src = res.secure_url;
+              vid.style.display = 'block';
+            } else {
+              document.getElementById('uploadResultVideo').style.display = 'none';
+              const img = document.getElementById('uploadResultPreview');
+              img.src = res.secure_url;
+              img.style.display = 'block';
+            }
+            showToast('✅ Uploaded successfully!');
+          } else {
+            showToast('Upload failed: ' + (res.error?.message || 'Unknown error'));
+          }
+        } catch (err) {
+          showToast('Upload error. Check Cloudinary config.');
+        }
+      };
+
+      xhr.onerror = () => {
+        progressEl.style.display = 'none';
+        showToast('Network error during upload.');
+      };
+
+      xhr.send(formData);
+    }
+
+    function copyUploadUrl() {
+      const url = document.getElementById('uploadResultUrl').textContent;
+      navigator.clipboard.writeText(url).then(() => showToast('URL copied!'));
+    }
+
+    // ── INIT ──────────────────────────────────────────────────────────────────────
+    initConvexSubscriptions();
+  </script>
 </body>
+
 </html>

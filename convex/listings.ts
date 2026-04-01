@@ -22,7 +22,6 @@ export const addListing = mutation({
     badgeLabel: v.optional(v.string()),
     verified: v.boolean(),
     agentId: v.id("agents"),
-    img: v.string(),
     videoUrl: v.optional(v.string()),
     inspectionFee: v.string(),
     status: v.string(),
@@ -66,7 +65,6 @@ export const addListing = mutation({
       badgeLabel: args.badgeLabel,
       verified: args.verified,
       agentId: args.agentId,
-      img: args.img,
       videoUrl: args.videoUrl,
       inspectionFee: args.inspectionFee,
       breakdown: args.breakdown,
@@ -309,6 +307,32 @@ export const getListingsSimple = query({
       nextCursor,
       hasMore,
     };
+  },
+});
+
+// Delete a listing
+export const deleteListing = mutation({
+  args: {
+    id: v.id("listings"),
+  },
+  handler: async (ctx, args) => {
+    const listing = await ctx.db.get(args.id);
+    if (!listing) {
+      throw new Error(`Listing with id ${args.id} not found`);
+    }
+
+    const agent = await ctx.db.get(listing.agentId);
+    if (!agent) {
+      throw new Error(`Agent with id ${listing.agentId} not found`);
+    }
+
+    await ctx.db.delete(args.id);
+
+    await ctx.db.patch(listing.agentId, {
+      listings: Math.max(0, (agent.listings || 0) - 1),
+    });
+
+    return { success: true, deletedListingId: args.id };
   },
 });
 
